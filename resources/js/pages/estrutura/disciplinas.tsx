@@ -1,12 +1,11 @@
 import { Bloco, BotaoIcone, Estado, LinhaForm, LinhaVazia, TituloPagina } from '@/components/erp';
 import InputError from '@/components/input-error';
-import { NavEstrutura, numeroCampo } from '@/components/seccoes';
+import { formatCreditos, NavEstrutura, numeroCampo } from '@/components/seccoes';
 import { Button } from '@/components/ui/button';
 import { CaixaEscolha } from '@/components/ui/caixa-escolha';
 import { Input } from '@/components/ui/input';
 import { usePode } from '@/hooks/use-pode';
 import AppLayout from '@/layouts/app-layout';
-import { formatNumero } from '@/lib/format';
 import { type Opcao } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { Pencil, Plus, Search } from 'lucide-react';
@@ -195,7 +194,7 @@ export default function Disciplinas({ disciplinas, unidades }: { disciplinas: Di
                             <tr key={d.id}>
                                 <td className="font-mono text-[12.5px]">{d.codigo}</td>
                                 <td>{d.nome}</td>
-                                <td className="text-right tabular-nums">{formatNumero(d.creditos)}</td>
+                                <td className="text-right tabular-nums">{formatCreditos(d.creditos)}</td>
                                 <td className="text-right tabular-nums">
                                     {d.horas_teoricas} · {d.horas_praticas}
                                 </td>

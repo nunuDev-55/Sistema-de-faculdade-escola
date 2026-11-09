@@ -1,11 +1,11 @@
 import { Bloco, BotaoIcone, CabecalhoFicha, ErroFicha, Estado, LinhaForm, LinhaVazia } from '@/components/erp';
 import InputError from '@/components/input-error';
-import { NavEstrutura } from '@/components/seccoes';
+import { formatCreditos, NavEstrutura } from '@/components/seccoes';
 import { Button } from '@/components/ui/button';
 import { CaixaEscolha } from '@/components/ui/caixa-escolha';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
-import { formatData, formatNumero } from '@/lib/format';
+import { formatData } from '@/lib/format';
 import { type Opcao, type SharedData } from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { CheckCircle2, CopyPlus, Plus, Trash2 } from 'lucide-react';
@@ -80,7 +80,7 @@ export default function Plano({ plano, curso, linhas, precedencias, disponiveis,
                 referencia={`Plano ${plano.versao}`}
                 titulo={`${curso.codigo} · ${curso.nome}`}
                 estado={<Estado cor={COR[plano.estado]}>{plano.estado_rotulo}</Estado>}
-                subtitulo={`${plano.metodo} · ${linhas.length} disciplinas · ${formatNumero(somaCreditos(linhas))} créditos${plano.aprovado_em ? ` · aprovado em ${formatData(plano.aprovado_em)}` : ''}`}
+                subtitulo={`${plano.metodo} · ${linhas.length} disciplinas · ${formatCreditos(somaCreditos(linhas))} créditos${plano.aprovado_em ? ` · aprovado em ${formatData(plano.aprovado_em)}` : ''}`}
             />
             <ErroFicha mensagem={errors.plano} />
 
@@ -136,7 +136,7 @@ export default function Plano({ plano, curso, linhas, precedencias, disponiveis,
                     const resumo = periodos
                         .map((p) => ({ p, ls: doAno.filter((l) => l.periodo === p) }))
                         .filter((x) => x.ls.length > 0)
-                        .map((x) => `${nomePeriodo(x.p)}: ${formatNumero(somaCreditos(x.ls))} cr.`)
+                        .map((x) => `${nomePeriodo(x.p)}: ${formatCreditos(somaCreditos(x.ls))} cr.`)
                         .join(' · ');
                     return (
                         <Bloco
@@ -162,7 +162,7 @@ export default function Plano({ plano, curso, linhas, precedencias, disponiveis,
                                             <td className="whitespace-nowrap">{nomePeriodo(l.periodo)}</td>
                                             <td className="font-mono text-[12.5px]">{l.codigo}</td>
                                             <td>{l.nome}</td>
-                                            <td className="text-right tabular-nums">{formatNumero(l.creditos)}</td>
+                                            <td className="text-right tabular-nums">{formatCreditos(l.creditos)}</td>
                                             <td>{l.obrigatoria ? 'Obrigatória' : 'Opcional'}</td>
                                             {pode.editar && (
                                                 <td>
