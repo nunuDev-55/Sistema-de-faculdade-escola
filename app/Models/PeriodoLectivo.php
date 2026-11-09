@@ -43,6 +43,7 @@ class PeriodoLectivo extends Model
         ];
     }
 
+    /** @return BelongsTo<AnoLectivo, $this> */
     public function ano(): BelongsTo
     {
         return $this->belongsTo(AnoLectivo::class, 'ano_lectivo_id');

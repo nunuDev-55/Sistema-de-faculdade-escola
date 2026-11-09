@@ -39,16 +39,19 @@ class Curso extends Model
         return ['activo' => 'boolean', 'duracao_anos' => 'integer'];
     }
 
+    /** @return BelongsTo<UnidadeOrganica, $this> */
     public function unidade(): BelongsTo
     {
         return $this->belongsTo(UnidadeOrganica::class, 'unidade_id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function director(): BelongsTo
     {
         return $this->belongsTo(User::class, 'director_id');
     }
 
+    /** @return HasMany<PlanoCurricular, $this> */
     public function planos(): HasMany
     {
         return $this->hasMany(PlanoCurricular::class, 'curso_id');

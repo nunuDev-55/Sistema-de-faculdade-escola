@@ -37,16 +37,19 @@ class UnidadeOrganica extends Model
         return ['activo' => 'boolean'];
     }
 
+    /** @return BelongsTo<UnidadeOrganica, $this> */
     public function pai(): BelongsTo
     {
         return $this->belongsTo(self::class, 'unidade_pai_id');
     }
 
+    /** @return HasMany<UnidadeOrganica, $this> */
     public function filhas(): HasMany
     {
         return $this->hasMany(self::class, 'unidade_pai_id');
     }
 
+    /** @return HasMany<Curso, $this> */
     public function cursos(): HasMany
     {
         return $this->hasMany(Curso::class, 'unidade_id');

@@ -28,11 +28,13 @@ class PlanoDisciplina extends Model
         return ['ano' => 'integer', 'periodo' => 'integer', 'obrigatoria' => 'boolean', 'nuclear' => 'boolean'];
     }
 
+    /** @return BelongsTo<PlanoCurricular, $this> */
     public function plano(): BelongsTo
     {
         return $this->belongsTo(PlanoCurricular::class, 'plano_id');
     }
 
+    /** @return BelongsTo<Disciplina, $this> */
     public function disciplina(): BelongsTo
     {
         return $this->belongsTo(Disciplina::class, 'disciplina_id');

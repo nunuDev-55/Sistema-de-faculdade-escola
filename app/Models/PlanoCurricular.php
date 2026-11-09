@@ -50,16 +50,19 @@ class PlanoCurricular extends Model
         return ['aprovado_em' => 'date'];
     }
 
+    /** @return BelongsTo<Curso, $this> */
     public function curso(): BelongsTo
     {
         return $this->belongsTo(Curso::class, 'curso_id');
     }
 
+    /** @return HasMany<PlanoDisciplina, $this> */
     public function linhas(): HasMany
     {
         return $this->hasMany(PlanoDisciplina::class, 'plano_id');
     }
 
+    /** @return HasMany<Precedencia, $this> */
     public function precedencias(): HasMany
     {
         return $this->hasMany(Precedencia::class, 'plano_id');
