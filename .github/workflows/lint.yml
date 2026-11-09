@@ -39,7 +39,7 @@ jobs:
           php artisan key:generate
 
       - name: Formatação do PHP (Pint)
-        run: vendor/bin/pint --test
+        run: vendor/bin/pint --test -v
 
       - name: Análise estática do PHP (Larastan)
         run: composer analisar

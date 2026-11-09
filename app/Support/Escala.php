@@ -121,7 +121,7 @@ final class Escala
 
         usort($intervalos, fn (array $a, array $b) => $a['min'] <=> $b['min']);
         $problemas = [];
-        $passo = 10 ** -self::casasDecimais();
+        $passo = 1 / (10 ** self::casasDecimais());
         $margem = 0.000001;
 
         if (abs($intervalos[0]['min']) > $margem) {
