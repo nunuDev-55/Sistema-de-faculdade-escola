@@ -64,3 +64,5 @@ Estudo de sistemas de gestão escolar e universitária de código aberto no GitH
 4. **Pauta como documento**: nasce em rascunho, o docente lança, valida-se, publica-se e fecha. Depois de fechada não se altera — uma correcção é um novo registo com motivo (a mesma regra dos documentos do nsERP).
 5. **Propinas reaproveitam a facturação do nsERP**: cobrança → pagamento (parcial ou total) → recibo, com numeração sem saltos e dinheiro em bcmath.
 6. **Portais separados** para estudante/encarregado e para candidatos, com guarda própria — o mesmo padrão da "Área do cliente" do nsERP.
+
+> Para o estudo **ao nível do código** (modelos de dados e lógica) dos dois sistemas mais integrados — Frappe Education e OpenEduCat — ver [08-estudo-sistemas-academicos.md](08-estudo-sistemas-academicos.md).

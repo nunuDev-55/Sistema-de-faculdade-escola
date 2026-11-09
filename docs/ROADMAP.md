@@ -13,6 +13,7 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 | 0.5 | Arquitectura — [05-arquitectura.md](05-arquitectura.md) | feito |
 | 0.6 | Processos e estados — [06-processos-e-estados.md](06-processos-e-estados.md) | feito |
 | 0.6a | Análise do eDondzo (portal do estudante) — [07-analise-edondzo.md](07-analise-edondzo.md) | feito (falta ver o lado da secretaria e dos docentes) |
+| 0.6b | Estudo de código dos sistemas mais integrados (Frappe Education, OpenEduCat) — [08-estudo-sistemas-academicos.md](08-estudo-sistemas-academicos.md) | feito |
 | 0.7 | Escolher a instituição-piloto e obter o regulamento pedagógico (escala, limites, pesos, propinas) | por fazer |
 | 0.8 | Protótipo dos ecrãs principais (folha de notas, ficha do estudante, portal) | por fazer |
 
@@ -29,8 +30,8 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 | # | Módulo | O que inclui |
 |---|---|---|
 | 2.1 | Unidades orgânicas e cursos / classes | Árvore, directores, regime e turno |
-| 2.2 | Disciplinas e planos curriculares | Versões, precedências, créditos |
-| 2.3 | Anos e períodos lectivos | Calendário, prazos de inscrição e exames |
+| 2.2 | Disciplinas e planos curriculares | Versões, precedências, créditos, método de avaliação por curso (OpenEduCat) |
+| 2.3 | Anos e períodos lectivos | Calendário, prazos de inscrição e exames; geração dos períodos a partir do ano (2 semestres / 3 trimestres, OpenEduCat) |
 | 2.4 | Salas e docentes | Ficha do docente ligada ao utilizador |
 
 ## Fase 3 — Percurso do estudante
@@ -46,7 +47,7 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 
 | # | Módulo | O que inclui |
 |---|---|---|
-| 4.1 | Plano de avaliação e lançamento de notas | Folha de notas tipo Excel |
+| 4.1 | Plano de avaliação e lançamento de notas | Escala de classificação por intervalos (Frappe); folha de notas tipo Excel |
 | 4.2 | Pautas | Rascunho → submetida → validada → publicada → fechada; impressão |
 | 4.3 | Exame e recorrência / trimestres e conselho de notas | Os dois tipos de instituição |
 | 4.4 | Revisões de nota | Sem apagar a anterior |

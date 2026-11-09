@@ -40,6 +40,19 @@ return [
         'minimo_dispensa_exame' => (float) env('NSEDU_MINIMO_DISPENSA', 14),
         'assiduidade_minima' => (int) env('NSEDU_ASSIDUIDADE_MINIMA', 75),
         'casas_decimais' => (int) env('NSEDU_CASAS_DECIMAIS', 2),
+
+        /*
+         * Escala de classificação por intervalos (padrão do Frappe Education, ver docs/08-estudo-sistemas-academicos.md).
+         * Cada instituição define a sua em Configuração; estes são os valores de origem (0–20, menções moçambicanas).
+         * Os intervalos têm de começar em 0, ser contíguos e chegar ao máximo (App\Support\Escala::problemasDosIntervalos).
+         */
+        'intervalos' => [
+            ['min' => 0, 'max' => 9.49, 'grau' => 'Reprovado'],
+            ['min' => 9.5, 'max' => 13.49, 'grau' => 'Suficiente'],
+            ['min' => 13.5, 'max' => 15.49, 'grau' => 'Bom'],
+            ['min' => 15.5, 'max' => 17.49, 'grau' => 'Muito Bom'],
+            ['min' => 17.5, 'max' => 20, 'grau' => 'Excelente'],
+        ],
     ],
 
     /*
