@@ -28,3 +28,6 @@ export function NavConfiguracao() {
 
 /** Número para mostrar num campo, à moçambicana: 12.5 → "12,5" */
 export const numeroCampo = (n: number | null | undefined) => (n === null || n === undefined ? '' : String(n).replace('.', ','));
+
+/** Créditos sem casas de dinheiro: 6 → "6", 4.5 → "4,5" */
+export const formatCreditos = (n: number) => (Number.isInteger(n) ? String(n) : String(Math.round(n * 10) / 10).replace('.', ','));
