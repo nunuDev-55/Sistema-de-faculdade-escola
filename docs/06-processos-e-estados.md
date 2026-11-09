@@ -55,7 +55,7 @@ stateDiagram-v2
     Reprovado --> [*]
 ```
 
-Ensino superior, com os limites de origem (RN-02 a RN-04). No ensino geral, a inscrição fica "Inscrito" o ano todo e a decisão é da **passagem de classe** (secção 6).
+Ensino superior, com os limites de origem (RN-02 a RN-04). A época **especial** (RN-03) é mais uma passagem depois da recorrência, só para quem o regulamento permite. No portal, enquanto a pauta não está publicada, a disciplina aparece "Por lançar" (RN-16). No ensino geral, a inscrição fica "Inscrito" o ano todo e a decisão é da **passagem de classe** (secção 6).
 
 ## 4. Pauta
 

@@ -171,6 +171,8 @@ Convenção do nsERP: cada rota do sistema interno exige uma permissão (`->midd
 | Confirmar matrícula | `POST /matriculas/{matricula}/confirmar` | `matriculas.criar` | Secretaria |
 | Suspender / anular / transferir | `POST /matriculas/{matricula}/estado` | `matriculas.estado` | Secretaria, Direcção |
 | Inscrever em disciplinas | `POST /matriculas/{matricula}/inscricoes` | `inscricoes.gerir` | Secretaria |
+| Confirmar inscrição semestral | `POST /inscricoes-periodo/{inscricao}/confirmar` | `inscricoes.gerir` | Secretaria |
+| Comprovativo de inscrição (2.ª via) | `GET /inscricoes-periodo/{inscricao}/comprovativo` | `inscricoes.gerir` | Secretaria |
 | Aprovar pedido de inscrição online | `POST /inscricoes/pedidos/{pedido}/aprovar` | `inscricoes.aprovar` | Secretaria, Director de curso |
 | Distribuir por turmas | `POST /turmas/{turma}/distribuir` | `turmas.gerir` | Secretaria |
 
@@ -183,6 +185,7 @@ Convenção do nsERP: cada rota do sistema interno exige uma permissão (`->midd
 | Montar horário | `GET/PUT /turmas/{turma}/horario` | `horarios.gerir` | Secretaria, Director de curso |
 | As minhas turmas | `GET /minhas-turmas` | `aulas.registar` | Docente |
 | Registar sumário e presenças | `POST /leccionacoes/{leccionacao}/aulas` | `aulas.registar` | Docente (só as suas) |
+| Anexar materiais à aula | `POST /aulas/{aula}/materiais` | `aulas.registar` | Docente (só as suas) |
 | Justificar faltas | `POST /presencas/{presenca}/justificar` | `presencas.justificar` | Secretaria, Director de turma |
 
 ### Avaliação e pautas
@@ -210,6 +213,7 @@ Convenção do nsERP: cada rota do sistema interno exige uma permissão (`->midd
 | Imprimir recibo | `GET /pagamentos/{pagamento}/recibo` | `financas.ver` | Tesouraria |
 | Anular recibo | `POST /pagamentos/{pagamento}/anular` | `pagamentos.anular` | Direcção |
 | Devedores | `GET /financas/devedores` | `financas.ver` | Tesouraria, Direcção |
+| Carregar ficheiro do banco (baixa automática pelas referências) | `POST /financas/ficheiros-banco` | `pagamentos.registar` | Tesouraria |
 
 ### Documentos académicos
 
@@ -225,12 +229,18 @@ Convenção do nsERP: cada rota do sistema interno exige uma permissão (`->midd
 | Caso de uso | Endereço |
 |---|---|
 | Início (avisos, próximas aulas, dívida) | `GET /portal` |
+| Inscrição semestral e comprovativo (2.ª via) | `GET/POST /portal/inscricao`, `GET /portal/inscricao/{inscricao}/comprovativo` |
+| Notas de frequência (por ano e semestre) | `GET /portal/notas/frequencia` |
+| Exames: normal, recorrência, especial | `GET /portal/notas/exames` |
+| Plano curricular | `GET /portal/plano` |
+| Aulas e materiais | `GET /portal/aulas`, `GET /portal/materiais/{material}` |
+| Referências bancárias | `GET /portal/financas/referencias` |
+| Inscrição na graduação | `POST /portal/graduacao` |
+| Dados pessoais e alterar senha | `GET/PUT /portal/dados`, `PUT /portal/senha` |
 | Escolher educando (encarregado) | `POST /portal/educando/{estudante}` |
 | Horário | `GET /portal/horario` |
-| Notas publicadas | `GET /portal/notas` |
 | Presenças | `GET /portal/presencas` |
 | Conta corrente e recibos | `GET /portal/financas` |
-| Pedir inscrição | `POST /portal/inscricao` |
 | Pedidos de documentos | `GET/POST /portal/pedidos` |
 
 ### Administração (igual ao nsERP)
@@ -243,6 +253,7 @@ Convenção do nsERP: cada rota do sistema interno exige uma permissão (`->midd
 | Utilizadores | `GET/POST/PUT /administracao/utilizadores` | `utilizadores.gerir` | Administrador |
 | Perfis e permissões | `GET/POST/PUT/DELETE /administracao/perfis` | `perfis.gerir` | Administrador |
 | Auditoria | `GET /administracao/auditoria` | `auditoria.ver` | Administrador, Direcção |
+| Enviar SMS (um, todos, perfil, curso, admitidos) | `GET/POST /comunicacao/sms` | `sms.enviar` | Secretaria, Direcção |
 | Cópias de segurança | `GET/POST /administracao/copias` | `copias.gerir` | Administrador |
 
 ## 5. Perfis de origem

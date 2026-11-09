@@ -12,6 +12,7 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 | 0.4 | Modelo de dados — [04-base-de-dados.md](04-base-de-dados.md) | feito |
 | 0.5 | Arquitectura — [05-arquitectura.md](05-arquitectura.md) | feito |
 | 0.6 | Processos e estados — [06-processos-e-estados.md](06-processos-e-estados.md) | feito |
+| 0.6a | Análise do eDondzo (portal do estudante) — [07-analise-edondzo.md](07-analise-edondzo.md) | feito (falta ver o lado da secretaria e dos docentes) |
 | 0.7 | Escolher a instituição-piloto e obter o regulamento pedagógico (escala, limites, pesos, propinas) | por fazer |
 | 0.8 | Protótipo dos ecrãs principais (folha de notas, ficha do estudante, portal) | por fazer |
 
@@ -55,7 +56,7 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 | # | Módulo | O que inclui |
 |---|---|---|
 | 5.1 | Tabela de preços e geração de cobranças | Por ano lectivo e curso |
-| 5.2 | Pagamentos e recibos | Parciais, alocação, recibo assinado (da facturação do nsERP) |
+| 5.2 | Pagamentos, recibos e referências bancárias | Parciais, adiantamentos, alocação, recibo assinado (da facturação do nsERP); uma referência por cobrança e baixa pelo ficheiro do banco |
 | 5.3 | Multas, bolsas e descontos, bloqueios por dívida | |
 | 5.4 | Devedores e lembretes | E-mail, depois SMS / WhatsApp |
 
@@ -66,7 +67,8 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 | 6.1 | Portal do estudante e do encarregado | Horário, notas, presenças, finanças |
 | 6.2 | Pedidos e emissão de documentos | Declarações, certificados, histórico, QR de verificação |
 | 6.3 | Candidaturas online | Fases, vagas, resultados, admissão |
-| 6.4 | Avisos | Por curso, turma, perfil |
+| 6.4 | Avisos e SMS | Por curso, turma, perfil, candidatos admitidos |
+| 6.5 | Inscrição na graduação | Finalistas, lista e reimpressão |
 
 ## Fase 7 — Relatórios e integrações
 
@@ -74,6 +76,6 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 |---|---|---|
 | 7.1 | Painel por perfil e relatórios | Efectivos, aproveitamento, assiduidade, receitas |
 | 7.2 | Mapas para o Ministério | Efectivos escolares e aproveitamento |
-| 7.3 | Pagamento online | M-Pesa, e-Mola, referência bancária |
+| 7.3 | Pagamento online | M-Pesa, e-Mola com confirmação imediata |
 | 7.4 | Ligação a um LMS | Moodle: exportar turmas, importar notas |
 | 7.5 | Publicação | Alojamento, domínio, cópias automáticas |

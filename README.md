@@ -18,6 +18,7 @@ Fase de **análise de sistemas**. Ainda não há código.
 | [Base de dados](docs/04-base-de-dados.md) | Modelo entidade-relação por módulo |
 | [Arquitectura](docs/05-arquitectura.md) | Stack, camadas, as quatro caras da aplicação, regras, instalação |
 | [Processos e estados](docs/06-processos-e-estados.md) | Ciclo de vida da candidatura, matrícula, inscrição, pauta, cobrança; sequências principais |
+| [Análise do eDondzo](docs/07-analise-edondzo.md) | Os passos do portal do estudante do eDondzo que o nsEDU segue, e o que faz melhor |
 | [Plano](docs/ROADMAP.md) | Fases de desenvolvimento |
 
 Os diagramas estão em Mermaid: o GitHub mostra-os directamente; para a monografia, cole-os em https://mermaid.live e exporte em PNG ou SVG.
