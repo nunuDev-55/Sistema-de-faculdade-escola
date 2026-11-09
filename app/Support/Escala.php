@@ -53,7 +53,8 @@ final class Escala
      */
     public static function grau(string $nota): ?string
     {
-        $valor = (float) $nota;
+        // Arredonda primeiro às casas da escala: os intervalos são contíguos a esse passo (9,49 → 9,50)
+        $valor = round((float) $nota, self::casasDecimais());
         foreach (self::intervalos() as $intervalo) {
             if ($valor >= $intervalo['min'] && $valor <= $intervalo['max']) {
                 return $intervalo['grau'];
@@ -106,7 +107,8 @@ final class Escala
     /**
      * Valida uma escala configurada pelo administrador (regra do Frappe Education): os intervalos começam em 0,
      * cada mínimo é menor do que o máximo, não se sobrepõem nem deixam falhas, e o último chega ao máximo da escala.
-     * Devolve a lista de problemas (vazia = válida), para a ficha os mostrar.
+     * Como as notas têm casas decimais, dois intervalos são contíguos quando o seguinte começa um passo depois
+     * do anterior (com 2 casas: 9,49 → 9,50). Devolve a lista de problemas (vazia = válida), para a ficha os mostrar.
      *
      * @param  list<array{min: float, max: float, grau: string}>  $intervalos
      * @return list<string>
@@ -119,26 +121,38 @@ final class Escala
 
         usort($intervalos, fn (array $a, array $b) => $a['min'] <=> $b['min']);
         $problemas = [];
+        $passo = 10 ** -self::casasDecimais();
+        $margem = 0.000001;
 
-        if (abs($intervalos[0]['min']) > 0.0001) {
+        if (abs($intervalos[0]['min']) > $margem) {
             $problemas[] = 'O primeiro intervalo tem de começar em 0.';
         }
 
-        $anterior = null;
-        foreach ($intervalos as $i) {
+        foreach ($intervalos as $n => $i) {
             if ($i['min'] >= $i['max']) {
                 $problemas[] = "O intervalo \"{$i['grau']}\" tem o mínimo igual ou acima do máximo.";
             }
-            if ($anterior !== null && abs($i['min'] - $anterior['max']) > 0.0001) {
-                $problemas[] = "Entre \"{$anterior['grau']}\" e \"{$i['grau']}\" há uma falha ou uma sobreposição.";
+            if ($n === 0) {
+                continue;
             }
-            $anterior = $i;
+            $anterior = $intervalos[$n - 1];
+            if ($i['min'] <= $anterior['max'] + $margem) {
+                $problemas[] = "Os intervalos \"{$anterior['grau']}\" e \"{$i['grau']}\" sobrepõem-se.";
+            } elseif ($i['min'] - $anterior['max'] > $passo + $margem) {
+                $problemas[] = "Entre \"{$anterior['grau']}\" e \"{$i['grau']}\" há notas sem intervalo.";
+            }
         }
 
-        if ($anterior !== null && abs($anterior['max'] - self::maxima()) > 0.0001) {
+        $ultimo = $intervalos[count($intervalos) - 1];
+        if (abs($ultimo['max'] - self::maxima()) > $margem) {
             $problemas[] = 'O último intervalo tem de chegar ao máximo da escala ('.self::maxima().').';
         }
 
         return $problemas;
+    }
+
+    private static function casasDecimais(): int
+    {
+        return (int) config('nsedu.avaliacao.casas_decimais');
     }
 }

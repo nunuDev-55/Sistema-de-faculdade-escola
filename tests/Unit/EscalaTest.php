@@ -44,6 +44,27 @@ class EscalaTest extends TestCase
         $this->assertSame([], Escala::problemasDosIntervalos($intervalos));
     }
 
+    public function test_a_escala_de_origem_e_valida(): void
+    {
+        $this->assertSame([], Escala::problemasDosIntervalos(Escala::intervalos()));
+    }
+
+    public function test_uma_nota_entre_dois_intervalos_arredonda_antes_do_grau(): void
+    {
+        // 9,495 arredonda para 9,50: cai em "Suficiente", não fica sem grau
+        $this->assertSame('Suficiente', Escala::grau('9.495'));
+    }
+
+    public function test_uma_escala_sobreposta_e_apanhada(): void
+    {
+        $intervalos = [
+            ['min' => 0.0, 'max' => 10.0, 'grau' => 'Reprovado'],
+            ['min' => 9.5, 'max' => 20.0, 'grau' => 'Aprovado'],
+        ];
+
+        $this->assertNotEmpty(Escala::problemasDosIntervalos($intervalos));
+    }
+
     public function test_uma_escala_com_falha_e_apanhada(): void
     {
         // Falta de 9,5 a 10 (falha) e não começa em 0.

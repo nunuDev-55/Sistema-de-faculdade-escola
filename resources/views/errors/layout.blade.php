@@ -36,7 +36,7 @@
             <p>@yield('mensagem')</p>
             <div class="accoes">
                 <a class="principal" href="/">Página inicial</a>
-                <a class="secundario" href="/catalogo">Ver o catálogo</a>
+                <a class="secundario" href="/painel">Ir para o painel</a>
             </div>
         </main>
     </body>
