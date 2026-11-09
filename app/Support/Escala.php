@@ -138,7 +138,7 @@ final class Escala
             $anterior = $intervalos[$n - 1];
             if ($i['min'] <= $anterior['max'] + $margem) {
                 $problemas[] = "Os intervalos \"{$anterior['grau']}\" e \"{$i['grau']}\" sobrepõem-se.";
-            } elseif ($i['min'] - $anterior['max'] > $passo + $margem) {
+            } elseif ($passo + $margem < $i['min'] - $anterior['max']) {
                 $problemas[] = "Entre \"{$anterior['grau']}\" e \"{$i['grau']}\" há notas sem intervalo.";
             }
         }
