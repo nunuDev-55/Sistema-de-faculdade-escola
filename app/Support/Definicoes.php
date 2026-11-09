@@ -107,9 +107,12 @@ class Definicoes
         }
     }
 
+    /** Endereço público do logótipo; o "v" muda quando se carrega outro, para o navegador não mostrar o antigo. */
     public function urlLogotipo(): ?string
     {
-        return $this->obter('instituicao.logotipo') ? route('instituicao.logotipo') : null;
+        $caminho = $this->obter('instituicao.logotipo');
+
+        return $caminho ? route('instituicao.logotipo', ['v' => substr(md5($caminho), 0, 8)]) : null;
     }
 
     /**

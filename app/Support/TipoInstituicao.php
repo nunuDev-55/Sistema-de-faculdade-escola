@@ -46,6 +46,18 @@ final class TipoInstituicao
         return self::actual() === self::SUPERIOR;
     }
 
+    /** Semestres por ano (superior) ou trimestres por ano (geral). */
+    public static function periodosPorAno(): int
+    {
+        return self::eSuperior() ? 2 : 3;
+    }
+
+    /** "semestre" ou "trimestre", para os períodos lectivos gerados. */
+    public static function tipoPeriodo(): string
+    {
+        return self::eSuperior() ? 'semestre' : 'trimestre';
+    }
+
     /** @return array<string, string> */
     public static function termos(): array
     {

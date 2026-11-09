@@ -5,12 +5,11 @@ namespace App\Support;
 /**
  * Escala de classificação e notas.
  *
- * As notas nunca andam em float para contas de dinheiro, mas para comparação e arredondamento de nota usam-se
- * como número. Guardam-se em decimal(5,2) e arredondam-se só no fim (ver docs/05-arquitectura.md, regra 2).
+ * As notas guardam-se em decimal(5,2) e arredondam-se só no fim (ver docs/05-arquitectura.md, regra 2).
  *
  * A escala é configurável por **intervalos** (padrão do Frappe Education, ver docs/08-estudo-sistemas-academicos.md):
- * cada instituição define os seus (0–20, 0–100, A–F…) e o grau de cada intervalo. Os valores de origem estão em
- * config/nsedu.php; quando o módulo de Configuração existir, a escala passa a vir da base de dados.
+ * cada instituição define os seus em Administração → Configuração → Avaliação. Enquanto não os gravar, valem os de
+ * origem em config/nsedu.php.
  */
 final class Escala
 {
@@ -30,7 +29,7 @@ final class Escala
 
     public static function maxima(): float
     {
-        return (float) config('nsedu.avaliacao.escala_maxima');
+        return (float) self::parametro('escala_maxima');
     }
 
     /** A nota é válida dentro da escala (0 até ao máximo configurado)? */
@@ -44,7 +43,7 @@ final class Escala
     /** Arredonda uma nota às casas decimais configuradas. */
     public static function arredondar(string $nota): string
     {
-        return number_format((float) $nota, (int) config('nsedu.avaliacao.casas_decimais'), '.', '');
+        return number_format((float) $nota, self::casasDecimais(), '.', '');
     }
 
     /**
@@ -71,10 +70,10 @@ final class Escala
     public static function situacaoFrequencia(string $media): string
     {
         $valor = (float) $media;
-        if ($valor < (float) config('nsedu.avaliacao.minimo_admissao_exame')) {
+        if ($valor < (float) self::parametro('minimo_admissao_exame')) {
             return 'excluido';
         }
-        if ($valor >= (float) config('nsedu.avaliacao.minimo_dispensa_exame')) {
+        if ($valor >= (float) self::parametro('minimo_dispensa_exame')) {
             return 'dispensado';
         }
 
@@ -83,7 +82,7 @@ final class Escala
 
     public static function aprovado(string $nota): bool
     {
-        return (float) $nota >= (float) config('nsedu.avaliacao.nota_minima_aprovacao');
+        return (float) $nota >= (float) self::parametro('nota_minima_aprovacao');
     }
 
     /**
@@ -93,35 +92,49 @@ final class Escala
      */
     public static function intervalos(): array
     {
-        /** @var list<array{min: float|int, max: float|int, grau: string}> $config */
-        $config = config('nsedu.avaliacao.intervalos', []);
-        $intervalos = array_map(
-            fn (array $i): array => ['min' => (float) $i['min'], 'max' => (float) $i['max'], 'grau' => (string) $i['grau']],
-            $config,
-        );
-        usort($intervalos, fn (array $a, array $b) => $a['min'] <=> $b['min']);
+        $guardados = self::parametro('intervalos');
 
-        return $intervalos;
+        return self::normalizar(is_array($guardados) ? $guardados : []);
     }
 
     /**
-     * Valida uma escala configurada pelo administrador (regra do Frappe Education): os intervalos começam em 0,
-     * cada mínimo é menor do que o máximo, não se sobrepõem nem deixam falhas, e o último chega ao máximo da escala.
-     * Como as notas têm casas decimais, dois intervalos são contíguos quando o seguinte começa um passo depois
-     * do anterior (com 2 casas: 9,49 → 9,50). Devolve a lista de problemas (vazia = válida), para a ficha os mostrar.
+     * @param  array<int|string, mixed>  $intervalos
+     * @return list<array{min: float, max: float, grau: string}>
+     */
+    public static function normalizar(array $intervalos): array
+    {
+        $lista = [];
+        foreach ($intervalos as $i) {
+            if (is_array($i)) {
+                $lista[] = ['min' => (float) ($i['min'] ?? 0), 'max' => (float) ($i['max'] ?? 0), 'grau' => trim((string) ($i['grau'] ?? ''))];
+            }
+        }
+        usort($lista, fn (array $a, array $b) => $a['min'] <=> $b['min']);
+
+        return $lista;
+    }
+
+    /**
+     * Valida uma escala (regra do Frappe Education): os intervalos começam em 0, cada mínimo é menor do que o
+     * máximo, não se sobrepõem nem deixam falhas, e o último chega ao máximo da escala. Como as notas têm casas
+     * decimais, dois intervalos são contíguos quando o seguinte começa um passo depois do anterior (com 2 casas:
+     * 9,49 → 9,50). Devolve a lista de problemas (vazia = válida), para a ficha os mostrar.
+     * Ao gravar uma escala nova, passa-se o máximo e as casas que vão ser gravados.
      *
      * @param  list<array{min: float, max: float, grau: string}>  $intervalos
      * @return list<string>
      */
-    public static function problemasDosIntervalos(array $intervalos): array
+    public static function problemasDosIntervalos(array $intervalos, ?float $maxima = null, ?int $casas = null): array
     {
         if ($intervalos === []) {
             return ['Defina pelo menos um intervalo para a escala.'];
         }
 
+        $maxima ??= self::maxima();
+        $casas ??= self::casasDecimais();
         usort($intervalos, fn (array $a, array $b) => $a['min'] <=> $b['min']);
         $problemas = [];
-        $passo = 1 / (10 ** self::casasDecimais());
+        $passo = 1 / (10 ** $casas);
         $margem = 0.000001;
 
         if (abs($intervalos[0]['min']) > $margem) {
@@ -129,6 +142,9 @@ final class Escala
         }
 
         foreach ($intervalos as $n => $i) {
+            if ($i['grau'] === '') {
+                $problemas[] = 'Todos os intervalos precisam do nome do grau.';
+            }
             if ($i['min'] >= $i['max']) {
                 $problemas[] = "O intervalo \"{$i['grau']}\" tem o mínimo igual ou acima do máximo.";
             }
@@ -144,15 +160,28 @@ final class Escala
         }
 
         $ultimo = $intervalos[count($intervalos) - 1];
-        if (abs($ultimo['max'] - self::maxima()) > $margem) {
-            $problemas[] = 'O último intervalo tem de chegar ao máximo da escala ('.self::maxima().').';
+        if (abs($ultimo['max'] - $maxima) > $margem) {
+            $problemas[] = 'O último intervalo tem de chegar ao máximo da escala ('.$maxima.').';
         }
 
-        return $problemas;
+        return array_values(array_unique($problemas));
+    }
+
+    /**
+     * Os valores da avaliação: os gravados em Configuração (tabela definicoes) ou, sem eles, os de config/nsedu.php.
+     */
+    public static function parametro(string $chave): mixed
+    {
+        $guardado = app(Definicoes::class)->obter('avaliacao.'.$chave);
+        if ($guardado !== null) {
+            return $chave === 'intervalos' ? json_decode($guardado, true) : $guardado;
+        }
+
+        return config('nsedu.avaliacao.'.$chave);
     }
 
     private static function casasDecimais(): int
     {
-        return (int) config('nsedu.avaliacao.casas_decimais');
+        return (int) self::parametro('casas_decimais');
     }
 }

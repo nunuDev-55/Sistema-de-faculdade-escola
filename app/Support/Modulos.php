@@ -7,11 +7,12 @@ namespace App\Support;
  *
  * No esqueleto, cada módulo abre num ecrã "em construção" com a sua lista de funcionalidades planeadas,
  * para que o menu e as permissões se possam experimentar desde já. À medida que cada módulo for feito,
- * a sua rota deixa de apontar para o ecrã "em construção" e passa a ter os seus próprios controladores e ecrãs.
+ * a sua rota deixa de apontar para o ecrã "em construção" e passa a ter os seus próprios controladores e ecrãs:
+ * marca-se com 'feito' => true e as rotas reais ficam em routes/web.php.
  */
 final class Modulos
 {
-    /** @var array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>}> */
+    /** @var array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool}> */
     public const LISTA = [
         'candidaturas' => [
             'href' => '/candidaturas',
@@ -66,6 +67,7 @@ final class Modulos
             'href' => '/estrutura',
             'titulo' => 'Estrutura académica',
             'permissao' => 'estrutura.ver',
+            'feito' => true,
             'descricao' => 'Unidades orgânicas, cursos, disciplinas, planos curriculares e calendário.',
             'planeado' => ['Faculdades, departamentos e cursos', 'Disciplinas e créditos', 'Planos curriculares com versões e precedências', 'Anos e períodos lectivos'],
         ],
@@ -74,7 +76,7 @@ final class Modulos
     /**
      * Módulos de Administração (herdados do nsERP, portam-se na fase 1).
      *
-     * @var array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>}>
+     * @var array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool}>
      */
     public const ADMINISTRACAO = [
         'utilizadores' => [
@@ -102,6 +104,7 @@ final class Modulos
             'href' => '/administracao/configuracao',
             'titulo' => 'Configuração',
             'permissao' => 'configuracao.gerir',
+            'feito' => true,
             'descricao' => 'Dados da instituição, marca e cores, tipo de instituição, regras pedagógicas e numeração.',
             'planeado' => ['Dados e logótipo da instituição', 'Cores e tipo (superior / geral)', 'Regras pedagógicas (escala, limites, pesos)', 'Numeração dos documentos'],
         ],
@@ -114,7 +117,7 @@ final class Modulos
         ],
     ];
 
-    /** @return array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>}> */
+    /** @return array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool}> */
     public static function todos(): array
     {
         return [...self::LISTA, ...self::ADMINISTRACAO];

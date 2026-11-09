@@ -3,14 +3,17 @@
 namespace Tests\Unit;
 
 use App\Support\Escala;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
  * A escala de classificação por intervalos (ver docs/08-estudo-sistemas-academicos.md).
- * Usa a configuração (config/nsedu.php), por isso arranca a aplicação; não toca na base de dados.
+ * Lê a configuração (tabela definicoes, com config/nsedu.php por omissão), por isso usa a base de testes.
  */
 class EscalaTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_le_notas_a_mocambicana(): void
     {
         $this->assertSame('12.50', Escala::lerNumero('12,5'));
