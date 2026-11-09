@@ -56,6 +56,14 @@ return [
     ],
 
     /*
+     * Inscrição semestral (ensino superior): o máximo de créditos por semestre, somando as disciplinas
+     * em atraso (RN-05). Muda-se em Administração → Configuração → Avaliação.
+     */
+    'inscricao' => [
+        'limite_creditos' => (float) env('NSEDU_LIMITE_CREDITOS', 36),
+    ],
+
+    /*
      * Cópias de segurança (a base de dados e os ficheiros num .zip). Igual ao nsERP.
      */
     'copias' => [

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Administracao;
 
 use App\Support\Escala;
+use App\Support\RegrasInscricao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -74,6 +75,7 @@ class ConfiguracaoTest extends TestCase
                 'minimo_admissao_exame' => '10',
                 'minimo_dispensa_exame' => '14,5',
                 'assiduidade_minima' => 80,
+                'limite_creditos' => '37,5',
                 'intervalos' => [
                     ['min' => '0', 'max' => '9,49', 'grau' => 'Reprovado'],
                     ['min' => '9,5', 'max' => '20', 'grau' => 'Aprovado'],
@@ -85,6 +87,7 @@ class ConfiguracaoTest extends TestCase
         $this->assertSame('Aprovado', Escala::grau('12'));
         $this->assertSame('admitido', Escala::situacaoFrequencia('14.2'));
         $this->assertSame('80', (string) Escala::parametro('assiduidade_minima'));
+        $this->assertSame(37.5, RegrasInscricao::limiteCreditos());
     }
 
     public function test_uma_escala_com_notas_sem_intervalo_e_recusada(): void

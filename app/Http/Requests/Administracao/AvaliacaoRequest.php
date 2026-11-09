@@ -19,7 +19,7 @@ class AvaliacaoRequest extends FormRequest
     {
         $numero = fn ($v) => is_string($v) ? (Escala::lerNumero($v) ?? $v) : $v;
         $dados = [];
-        foreach (['escala_maxima', 'nota_minima_aprovacao', 'minimo_admissao_exame', 'minimo_dispensa_exame'] as $campo) {
+        foreach (['escala_maxima', 'nota_minima_aprovacao', 'minimo_admissao_exame', 'minimo_dispensa_exame', 'limite_creditos'] as $campo) {
             $dados[$campo] = $numero($this->input($campo));
         }
         $intervalos = $this->input('intervalos');
@@ -41,6 +41,7 @@ class AvaliacaoRequest extends FormRequest
             'minimo_admissao_exame' => ['required', 'numeric', 'min:0'],
             'minimo_dispensa_exame' => ['required', 'numeric', 'min:0'],
             'assiduidade_minima' => ['required', 'integer', 'min:0', 'max:100'],
+            'limite_creditos' => ['nullable', 'numeric', 'min:1', 'max:120'],
             'intervalos' => ['required', 'array', 'min:1', 'max:20'],
             'intervalos.*.min' => ['required', 'numeric', 'min:0'],
             'intervalos.*.max' => ['required', 'numeric', 'min:0'],

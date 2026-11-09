@@ -23,23 +23,23 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 |---|---|---|
 | 1.1 | Esqueleto | **Feito**: Laravel 12 + Inertia + React a partir do nsERP, sem os módulos comerciais; entrada, permissões e perfis de origem, painel e menu por perfil, ecrãs "em construção" por módulo; CI no GitHub |
 | 1.2 | Utilizadores, perfis e permissões | Perfis Direcção, Director de curso, Secretaria, Docente, Tesouraria |
-| 1.3 | Configuração da instituição | Dados, marca, tipo de instituição, regras pedagógicas, numeração |
+| 1.3 | Configuração da instituição | **Feito**: dados, logótipo e cores, tipo de instituição, escala por intervalos, limites de avaliação e de créditos. Falta o ecrã da numeração |
 
 ## Fase 2 — Estrutura académica
 
 | # | Módulo | O que inclui |
 |---|---|---|
-| 2.1 | Unidades orgânicas e cursos / classes | Árvore, directores, regime e turno |
-| 2.2 | Disciplinas e planos curriculares | Versões, precedências, créditos, método de avaliação por curso (OpenEduCat) |
-| 2.3 | Anos e períodos lectivos | Calendário, prazos de inscrição e exames; geração dos períodos a partir do ano (2 semestres / 3 trimestres, OpenEduCat) |
+| 2.1 | Unidades orgânicas e cursos / classes | **Feito**: unidades orgânicas e cursos com grau e duração |
+| 2.2 | Disciplinas e planos curriculares | **Feito**: versões (rascunho → em vigor → substituído), precedências por plano, créditos, método de avaliação por plano (OpenEduCat) |
+| 2.3 | Anos e períodos lectivos | **Feito**: calendário, prazos de inscrição e exames; geração dos períodos a partir do ano (2 semestres / 3 trimestres, OpenEduCat) |
 | 2.4 | Salas e docentes | Ficha do docente ligada ao utilizador |
 
 ## Fase 3 — Percurso do estudante
 
 | # | Módulo | O que inclui |
 |---|---|---|
-| 3.1 | Estudantes e encarregados | Ficha com separadores, importação do Excel, pesquisa |
-| 3.2 | Matrícula e inscrição | Regras de precedência e créditos, turmas |
+| 3.1 | Estudantes e encarregados | **Feito**: número único por ano de entrada, ficha com separadores, encarregados (um para vários irmãos, pelo telemóvel), pesquisa e filtros. Falta a importação do Excel e a fotografia |
+| 3.2 | Matrícula e inscrição | **Feito**: matrícula no plano em vigor (a renovação mantém o plano em que entrou), suspender / reactivar / anular, inscrição semestral com precedências, disciplinas em atraso e limite de créditos, comprovativo para imprimir; no ensino geral, inscrição anual em todas as disciplinas da classe. Falta a distribuição por turmas (com a oferta lectiva) e o pedido de inscrição no portal |
 | 3.3 | Distribuição de serviço e horários | Sem sobreposições |
 | 3.4 | Sumários e presenças | Folha de presenças, justificações, assiduidade |
 
