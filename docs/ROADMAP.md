@@ -20,7 +20,7 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 
 | # | Módulo | O que inclui |
 |---|---|---|
-| 1.1 | Esqueleto | Laravel 12 + Inertia + React a partir do nsERP, sem os módulos comerciais; CI no GitHub |
+| 1.1 | Esqueleto | **Feito**: Laravel 12 + Inertia + React a partir do nsERP, sem os módulos comerciais; entrada, permissões e perfis de origem, painel e menu por perfil, ecrãs "em construção" por módulo; CI no GitHub |
 | 1.2 | Utilizadores, perfis e permissões | Perfis Direcção, Director de curso, Secretaria, Docente, Tesouraria |
 | 1.3 | Configuração da instituição | Dados, marca, tipo de instituição, regras pedagógicas, numeração |
 

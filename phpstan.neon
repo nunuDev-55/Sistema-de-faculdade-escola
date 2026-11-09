@@ -1,0 +1,11 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+# Análise estática do PHP (Larastan): encontra erros sem correr o sistema. Corre com: composer analisar
+parameters:
+    paths:
+        - app
+        - routes
+        - database
+    level: 5
+    tmpDir: storage/framework/phpstan

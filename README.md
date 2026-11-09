@@ -8,7 +8,9 @@ Serve **universidades e institutos** (cursos, semestres, créditos, exames e rec
 
 ## Estado
 
-Fase de **análise de sistemas**. Ainda não há código.
+**Esqueleto a funcionar** (fase 1.1 do [plano](docs/ROADMAP.md)): a aplicação Laravel 12 + Inertia + React, a partir da base do nsERP, já com a entrada no sistema, os perfis e as permissões de origem, o painel e o menu por perfil. Cada módulo (candidaturas, estudantes, matrículas, avaliação, finanças, documentos...) abre num ecrã "em construção" com o que vai ter, para o menu e as permissões se poderem experimentar desde já. Os módulos vão sendo feitos um a um (ver o [plano](docs/ROADMAP.md)).
+
+### Análise de sistemas
 
 | Documento | Conteúdo |
 |---|---|
@@ -32,4 +34,43 @@ O mesmo stack do [nsERP](https://github.com/nunuDev-55/nsERP), do qual parte a b
 | Frontend | React 19 + TypeScript, Tailwind CSS 4, componentes shadcn/ui |
 | Ligação frontend/backend | Inertia.js 2 |
 | Backend | Laravel 12 (PHP 8.2) |
-| Base de dados | MariaDB 10.4 (XAMPP) |
+| Base de dados | MariaDB 10.4 (SQLite no desenvolvimento e nos testes) |
+
+## Arrancar (desenvolvimento)
+
+Precisa de PHP 8.2+, Composer e Node 18+.
+
+```bash
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite   # ou configure o MariaDB no .env
+php artisan migrate --seed        # cria as tabelas e os perfis de origem
+composer run dev                  # Laravel + Vite (ou: php artisan serve + npm run dev)
+```
+
+No primeiro acesso, o ecrã de registo cria a conta do **administrador**; depois disso o registo fecha-se e os utilizadores passam a ser criados dentro do sistema.
+
+### Qualidade
+
+```bash
+composer run verificar   # Pint (estilo), Larastan (análise estática) e os testes
+npx tsc --noEmit         # tipos do frontend
+npx eslint .             # regras do frontend
+npx prettier --check resources/
+```
+
+As mesmas verificações correm no GitHub a cada envio (`.github/workflows`).
+
+## Como está organizado
+
+O código segue a arquitectura em camadas descrita em [docs/05-arquitectura.md](docs/05-arquitectura.md):
+
+- `app/Support/` — peças partilhadas: `Permissoes` (catálogo de permissões e perfis), `Definicoes` (configuração da instituição), `TipoInstituicao` (superior / geral), `Escala` (notas), `Dinheiro`, `Modulos`.
+- `app/Services/` — regras de negócio (por agora, `Numeracao`).
+- `app/Http/` — controladores finos, pedidos (validação) e middleware.
+- `resources/js/` — ecrãs (`pages/`), peças (`components/`), menu (`lib/navegacao.ts`) e layouts.
+- `database/migrations/` — tabelas base (utilizadores, permissões, auditoria, numeração, configuração).
+
+Para acrescentar um módulo, ver "Acrescentar um módulo novo" em [docs/05-arquitectura.md](docs/05-arquitectura.md).

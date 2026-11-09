@@ -1,0 +1,14 @@
+{
+    "name": "nsEDU",
+    "short_name": "nsEDU",
+    "description": "Sistema de gestão de universidades e escolas",
+    "lang": "pt",
+    "start_url": "/painel",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#1f3a8a",
+    "icons": [
+        { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+    ]
+}
