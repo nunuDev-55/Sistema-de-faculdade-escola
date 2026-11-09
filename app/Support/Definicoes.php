@@ -90,6 +90,23 @@ class Definicoes
         ];
     }
 
+    /**
+     * Nome, logótipo e cor para as páginas de erro (403, 404, 500...). Nunca falha: a página de erro pode
+     * aparecer justamente porque a base de dados está em baixo. (Herdado do nsERP.)
+     *
+     * @return array{nome: string, logotipo: string|null, cor: string}
+     */
+    public static function paraPaginaDeErro(): array
+    {
+        try {
+            $d = app(self::class);
+
+            return ['nome' => $d->nomeCurto(), 'logotipo' => $d->urlLogotipo(), 'cor' => $d->cores()['cor']];
+        } catch (\Throwable) {
+            return ['nome' => (string) config('nsedu.produto.nome'), 'logotipo' => null, 'cor' => self::COR];
+        }
+    }
+
     public function urlLogotipo(): ?string
     {
         return $this->obter('instituicao.logotipo') ? route('instituicao.logotipo') : null;
