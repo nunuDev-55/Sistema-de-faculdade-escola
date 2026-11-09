@@ -1,10 +1,12 @@
 import AppLogoIcon from '@/components/app-logo-icon';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
+import { MensagemFlash } from '@/components/erp';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { usePode } from '@/hooks/use-pode';
+import { useTabelasEmCartoes } from '@/hooks/use-tabelas-em-cartoes';
 import { itemActivo, NAVEGACAO } from '@/lib/navegacao';
 import { cn } from '@/lib/utils';
 import { type SharedData } from '@/types';
@@ -18,6 +20,9 @@ import { type ReactNode } from 'react';
  * a permissão (usePode) — a protecção verdadeira está sempre no backend.
  */
 export default function AppLayout({ children }: { children: ReactNode }) {
+    // No telemóvel, as listas (table.tabela) passam a cartões
+    useTabelasEmCartoes();
+
     return (
         <div className="flex min-h-svh">
             <aside className="bg-sidebar sticky top-0 hidden h-svh w-60 shrink-0 flex-col border-r lg:flex print:hidden">
@@ -42,6 +47,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                     </div>
                 </header>
                 <main className="mx-auto w-full max-w-[1400px] min-w-0 flex-1 px-4 py-6 md:px-8 md:py-7 print:max-w-none print:p-0">{children}</main>
+                <MensagemFlash />
             </div>
         </div>
     );

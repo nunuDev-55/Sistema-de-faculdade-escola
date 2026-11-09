@@ -31,11 +31,13 @@ class Disciplina extends Model
         return ['creditos' => 'decimal:1', 'activo' => 'boolean', 'horas_teoricas' => 'integer', 'horas_praticas' => 'integer'];
     }
 
+    /** @return BelongsTo<UnidadeOrganica, $this> */
     public function unidade(): BelongsTo
     {
         return $this->belongsTo(UnidadeOrganica::class, 'unidade_id');
     }
 
+    /** @return HasMany<PlanoDisciplina, $this> */
     public function nosPlanos(): HasMany
     {
         return $this->hasMany(PlanoDisciplina::class, 'disciplina_id');

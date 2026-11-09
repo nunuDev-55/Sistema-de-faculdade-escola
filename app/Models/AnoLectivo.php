@@ -35,6 +35,7 @@ class AnoLectivo extends Model
         return ['inicio' => 'date', 'fim' => 'date'];
     }
 
+    /** @return HasMany<PeriodoLectivo, $this> */
     public function periodos(): HasMany
     {
         return $this->hasMany(PeriodoLectivo::class, 'ano_lectivo_id')->orderBy('numero');

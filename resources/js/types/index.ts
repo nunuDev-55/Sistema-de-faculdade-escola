@@ -38,3 +38,9 @@ export interface NavItem {
     url: string;
     icon?: LucideIcon | null;
 }
+
+/** Opção de uma caixa de escolha (vem do servidor: App\Support\Opcoes) */
+export interface Opcao {
+    valor: string;
+    rotulo: string;
+}

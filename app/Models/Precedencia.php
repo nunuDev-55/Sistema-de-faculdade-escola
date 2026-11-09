@@ -21,11 +21,13 @@ class Precedencia extends Model
 
     protected $fillable = ['plano_id', 'disciplina_id', 'precedente_id'];
 
+    /** @return BelongsTo<Disciplina, $this> */
     public function disciplina(): BelongsTo
     {
         return $this->belongsTo(Disciplina::class, 'disciplina_id');
     }
 
+    /** @return BelongsTo<Disciplina, $this> */
     public function precedente(): BelongsTo
     {
         return $this->belongsTo(Disciplina::class, 'precedente_id');
