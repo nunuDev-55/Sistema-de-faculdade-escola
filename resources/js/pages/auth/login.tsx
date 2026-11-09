@@ -50,7 +50,7 @@ export default function Login({ status, canResetPassword, canRegister }: LoginPr
                             autoComplete="email"
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
-                            placeholder="nome@empresa.co.mz"
+                            placeholder="nome@instituicao.ac.mz"
                         />
                         <InputError message={errors.email} />
                     </div>
