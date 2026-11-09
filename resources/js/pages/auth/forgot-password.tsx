@@ -39,7 +39,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                             value={data.email}
                             autoFocus
                             onChange={(e) => setData('email', e.target.value)}
-                            placeholder="nome@empresa.co.mz"
+                            placeholder="nome@instituicao.ac.mz"
                         />
 
                         <InputError message={errors.email} />

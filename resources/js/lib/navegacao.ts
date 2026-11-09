@@ -44,13 +44,13 @@ export const NAVEGACAO: GrupoNav[] = [
             { label: 'Estudantes', href: '/estudantes', icone: Users, permissao: 'estudantes.ver' },
             { label: 'Matrículas', href: '/matriculas', icone: ClipboardList, permissao: 'matriculas.criar' },
             { label: 'Avaliação', href: '/pautas', icone: GraduationCap, permissao: 'pautas.ver' },
+            { label: 'Docência', href: '/docencia', icone: CalendarDays, permissao: 'aulas.registar' },
             { label: 'Estrutura', href: '/estrutura', icone: Network, permissao: 'estrutura.ver' },
         ],
     },
     {
         titulo: 'Gestão',
         itens: [
-            { label: 'Docência', href: '/docencia', icone: CalendarDays, permissao: 'aulas.registar' },
             { label: 'Finanças', href: '/financas', icone: Wallet, permissao: 'financas.ver' },
             { label: 'Documentos', href: '/documentos', icone: FileText, permissao: 'documentos.ver' },
         ],

@@ -64,7 +64,7 @@ export default function Register() {
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
                             disabled={processing}
-                            placeholder="nome@empresa.co.mz"
+                            placeholder="nome@instituicao.ac.mz"
                         />
                         <InputError message={errors.email} />
                     </div>
