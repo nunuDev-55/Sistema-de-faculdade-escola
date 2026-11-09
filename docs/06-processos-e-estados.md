@@ -36,6 +36,10 @@ stateDiagram-v2
 
 No fecho do ano, a matrícula concluída recebe o **resultado**: transita, não transita ou graduado (fim do curso / da última classe).
 
+Feita pela secretaria, a matrícula nasce já **activa** (`App\Services\MatriculaService`); o rascunho fica para o pedido de matrícula no portal. O estudante fica no plano curricular em que entrou no curso: na renovação usa-se o plano da matrícula anterior, mesmo que outra versão tenha entrado em vigor (RN-15). Anular a matrícula anula também as inscrições que ainda não têm resultado.
+
+**Que disciplinas aparecem na inscrição de um semestre** (`App\Services\InscricaoService::situacao`): as do plano até ao ano do estudante que se dão nesse semestre (uma de 1.º semestre só num 1.º semestre, porque é quando há turmas; as anuais a partir do 1.º). As de anos anteriores ainda não aprovadas aparecem **em atraso**. Cada uma fica: pode inscrever-se, já aprovou, já está inscrito, em curso (inscrito noutro semestre, sem resultado) ou bloqueada (falta aprovar a precedente, com o nome). O total, com as em atraso, não pode passar o limite de créditos da Configuração.
+
 ## 3. Inscrição numa disciplina
 
 ```mermaid

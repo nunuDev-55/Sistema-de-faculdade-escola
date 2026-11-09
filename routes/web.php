@@ -6,6 +6,10 @@ use App\Http\Controllers\Estrutura\CursoController;
 use App\Http\Controllers\Estrutura\DisciplinaController;
 use App\Http\Controllers\Estrutura\PlanoController;
 use App\Http\Controllers\Estrutura\UnidadeController;
+use App\Http\Controllers\Estudantes\EncarregadoController;
+use App\Http\Controllers\Estudantes\EstudanteController;
+use App\Http\Controllers\Estudantes\InscricaoController;
+use App\Http\Controllers\Estudantes\MatriculaController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\ModuloController;
 use App\Support\Modulos;
@@ -52,6 +56,31 @@ Route::middleware(['auth:web'])->group(function () {
             Route::post('calendario', [CalendarioController::class, 'store'])->name('calendario.store');
             Route::put('calendario/periodos/{periodo}', [CalendarioController::class, 'actualizarPeriodo'])->name('calendario.periodos.update');
         });
+    });
+
+    // Estudantes e encarregados; o comprovativo de inscrição vê-se a partir da ficha
+    Route::middleware('can:estudantes.ver')->group(function () {
+        Route::get('estudantes', [EstudanteController::class, 'index'])->name('estudantes.index');
+        Route::middleware('can:estudantes.gerir')->group(function () {
+            Route::get('estudantes/novo', [EstudanteController::class, 'create'])->name('estudantes.create');
+            Route::post('estudantes', [EstudanteController::class, 'store'])->name('estudantes.store');
+            Route::get('estudantes/{estudante}/editar', [EstudanteController::class, 'edit'])->name('estudantes.edit');
+            Route::put('estudantes/{estudante}', [EstudanteController::class, 'update'])->name('estudantes.update');
+            Route::post('estudantes/{estudante}/encarregados', [EncarregadoController::class, 'store'])->name('estudantes.encarregados.store');
+            Route::delete('estudantes/{estudante}/encarregados/{encarregado}', [EncarregadoController::class, 'destroy'])->name('estudantes.encarregados.destroy');
+        });
+        Route::get('estudantes/{estudante}', [EstudanteController::class, 'show'])->whereNumber('estudante')->name('estudantes.show');
+        Route::get('comprovativos/{inscricaoPeriodo}', [InscricaoController::class, 'comprovativo'])->name('inscricoes.comprovativo');
+    });
+
+    // Matrículas no ano lectivo e inscrição semestral nas disciplinas
+    Route::get('matriculas', [MatriculaController::class, 'index'])->middleware('can:matriculas.criar')->name('matriculas.index');
+    Route::post('estudantes/{estudante}/matriculas', [MatriculaController::class, 'store'])->middleware('can:matriculas.criar')->name('matriculas.store');
+    Route::put('matriculas/{matricula}/estado', [MatriculaController::class, 'estado'])->middleware('can:matriculas.estado')->name('matriculas.estado');
+    Route::middleware('can:inscricoes.gerir')->group(function () {
+        Route::get('matriculas/{matricula}/inscricao/{periodo}', [InscricaoController::class, 'create'])->name('inscricoes.create');
+        Route::post('matriculas/{matricula}/inscricao/{periodo}', [InscricaoController::class, 'store'])->name('inscricoes.store');
+        Route::delete('inscricoes/{inscricao}', [InscricaoController::class, 'destroy'])->name('inscricoes.destroy');
     });
 
     // Administração → Configuração: dados da instituição e regras de avaliação

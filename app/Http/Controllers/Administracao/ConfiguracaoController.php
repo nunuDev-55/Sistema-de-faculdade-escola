@@ -8,6 +8,7 @@ use App\Http\Requests\Administracao\InstituicaoRequest;
 use App\Models\Curso;
 use App\Support\Definicoes;
 use App\Support\Escala;
+use App\Support\RegrasInscricao;
 use App\Support\TipoInstituicao;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\UploadedFile;
@@ -90,6 +91,7 @@ class ConfiguracaoController extends Controller
                 'minimo_admissao_exame' => (float) Escala::parametro('minimo_admissao_exame'),
                 'minimo_dispensa_exame' => (float) Escala::parametro('minimo_dispensa_exame'),
                 'assiduidade_minima' => (int) Escala::parametro('assiduidade_minima'),
+                'limite_creditos' => RegrasInscricao::limiteCreditos(),
                 'intervalos' => Escala::intervalos(),
             ],
         ]);
@@ -108,6 +110,7 @@ class ConfiguracaoController extends Controller
             'avaliacao.minimo_dispensa_exame' => (string) (float) $v['minimo_dispensa_exame'],
             'avaliacao.assiduidade_minima' => (string) (int) $v['assiduidade_minima'],
             'avaliacao.intervalos' => (string) json_encode($intervalos),
+            ...(isset($v['limite_creditos']) ? ['inscricao.limite_creditos' => (string) (float) $v['limite_creditos']] : []),
         ], 'Regras de avaliação alteradas');
 
         return back()->with('sucesso', 'Regras de avaliação guardadas.');

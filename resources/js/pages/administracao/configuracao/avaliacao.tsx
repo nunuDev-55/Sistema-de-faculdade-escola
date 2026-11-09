@@ -23,6 +23,7 @@ interface Props {
         minimo_admissao_exame: number;
         minimo_dispensa_exame: number;
         assiduidade_minima: number;
+        limite_creditos: number;
         intervalos: Intervalo[];
     };
 }
@@ -34,6 +35,7 @@ interface Formulario {
     minimo_admissao_exame: string;
     minimo_dispensa_exame: string;
     assiduidade_minima: string;
+    limite_creditos: string;
     intervalos: { min: string; max: string; grau: string }[];
 }
 
@@ -45,6 +47,7 @@ export default function Avaliacao({ dados }: Props) {
         minimo_admissao_exame: numeroCampo(dados.minimo_admissao_exame),
         minimo_dispensa_exame: numeroCampo(dados.minimo_dispensa_exame),
         assiduidade_minima: String(dados.assiduidade_minima),
+        limite_creditos: numeroCampo(dados.limite_creditos),
         intervalos: dados.intervalos.map((i) => ({ min: numeroCampo(i.min), max: numeroCampo(i.max), grau: i.grau })),
     });
     const erros = errors as Record<string, string | undefined>;
@@ -103,6 +106,15 @@ export default function Avaliacao({ dados }: Props) {
                     {numero('minimo_admissao_exame', 'Mínimo para ir a exame', 'Abaixo disto, a média de frequência exclui o estudante.')}
                     {numero('minimo_dispensa_exame', 'Mínimo para dispensar o exame', 'A partir disto, o estudante fica dispensado.')}
                     {numero('assiduidade_minima', 'Assiduidade mínima', 'Abaixo disto, o estudante fica excluído por faltas.', '%')}
+                </Bloco>
+
+                <Bloco titulo="Inscrição semestral">
+                    {numero(
+                        'limite_creditos',
+                        'Limite de créditos por semestre',
+                        'Ensino superior. Conta as disciplinas do semestre e as em atraso.',
+                        'créditos',
+                    )}
                 </Bloco>
 
                 <Bloco

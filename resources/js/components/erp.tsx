@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { CheckCircle2, ChevronLeft, CircleAlert, X, type LucideIcon } from 'lucide-react';
+import { CheckCircle2, ChevronLeft, ChevronRight, CircleAlert, X, type LucideIcon } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 
 /* ---------------------------------------------------------------- Título */
@@ -289,6 +289,86 @@ export function MensagemFlash() {
             >
                 <X className="size-4" />
             </button>
+        </div>
+    );
+}
+
+/* ---------------------------------------------------------------- Listas longas */
+
+/** Página de resultados de uma lista paginada no servidor (paginate() do Laravel) */
+export interface Pagina<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    total: number;
+    from: number | null;
+    to: number | null;
+    prev_page_url: string | null;
+    next_page_url: string | null;
+}
+
+/** Anterior / seguinte por baixo de uma tabela paginada; não aparece se tudo couber numa página */
+export function Paginacao<T>({ pagina }: { pagina: Pagina<T> }) {
+    if (pagina.last_page <= 1) return null;
+    const botao = (url: string | null, rotulo: string, Icone: LucideIcon) =>
+        url ? (
+            <Button asChild size="sm" variant="outline">
+                <Link href={url} preserveScroll preserveState>
+                    {rotulo === 'Anterior' && <Icone className="size-4" />}
+                    {rotulo}
+                    {rotulo === 'Seguinte' && <Icone className="size-4" />}
+                </Link>
+            </Button>
+        ) : (
+            <Button size="sm" variant="outline" disabled>
+                {rotulo}
+            </Button>
+        );
+    return (
+        <nav className="flex items-center justify-between gap-3 border-t px-4 py-2.5 text-[13px]" aria-label="Páginas da lista">
+            <span className="text-muted-foreground tabular-nums">
+                {pagina.from}–{pagina.to} de {pagina.total}
+            </span>
+            <div className="flex gap-2">
+                {botao(pagina.prev_page_url, 'Anterior', ChevronLeft)}
+                {botao(pagina.next_page_url, 'Seguinte', ChevronRight)}
+            </div>
+        </nav>
+    );
+}
+
+/** Separadores dentro de uma ficha (Percurso, Dados pessoais, Encarregados), sem mudar de endereço */
+export function Separadores<T extends string>({
+    itens,
+    activo,
+    mudar,
+}: {
+    itens: { valor: T; label: ReactNode }[];
+    activo: T;
+    mudar: (valor: T) => void;
+}) {
+    return (
+        <div
+            role="tablist"
+            className="mb-5 flex [scrollbar-width:none] gap-5 overflow-x-auto overflow-y-hidden border-b [&::-webkit-scrollbar]:hidden"
+        >
+            {itens.map((i) => (
+                <button
+                    key={i.valor}
+                    type="button"
+                    role="tab"
+                    aria-selected={i.valor === activo}
+                    onClick={() => mudar(i.valor)}
+                    className={cn(
+                        '-mb-px border-b-2 pb-2.5 text-[13.5px] whitespace-nowrap transition-colors',
+                        i.valor === activo
+                            ? 'border-foreground text-foreground font-medium'
+                            : 'text-muted-foreground hover:text-foreground border-transparent',
+                    )}
+                >
+                    {i.label}
+                </button>
+            ))}
         </div>
     );
 }
