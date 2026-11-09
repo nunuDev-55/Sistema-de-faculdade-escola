@@ -118,7 +118,7 @@ Uma aplicação web para uma instituição de ensino gerir, num só sítio, **o 
 
 | Código | Requisito | Prio. |
 |---|---|---|
-| RF-70 | Definir a escala (0–20 por defeito), as casas decimais e o arredondamento. | D |
+| RF-70 | Definir a **escala de classificação por intervalos** (0–20 por defeito), com o grau de cada intervalo (Reprovado, Suficiente, Bom...), as casas decimais e o arredondamento. Os intervalos têm de começar em 0, ser contíguos e chegar ao máximo (padrão do Frappe Education, ver [08](08-estudo-sistemas-academicos.md)). | D |
 | RF-71 | Definir o plano de avaliação de cada disciplina na turma: componentes (testes, trabalhos, exame), pesos e datas. A soma dos pesos tem de dar 100 %. Modelo de origem: **2 avaliações + 2 trabalhos** (o do eDondzo). | D |
 | RF-72 | O docente lança as notas de cada componente num ecrã tipo folha (teclado, colar do Excel). | D |
 | RF-73 | O sistema calcula a média de frequência e a situação (excluído, admitido a exame, dispensado) segundo as regras da instituição. | D |
@@ -132,7 +132,7 @@ Uma aplicação web para uma instituição de ensino gerir, num só sítio, **o 
 
 | Código | Requisito | Prio. |
 |---|---|---|
-| RF-80 | Tabela de preços por ano lectivo: matrícula, **taxa de inscrição semestral**, propina (mensal, com vencimento num **dia fixo**, por defeito o dia 10), emolumentos (declaração, certificado, exame de recorrência, 2.ª via de cartão). | D |
+| RF-80 | Tabela de preços por ano lectivo: matrícula, **taxa de inscrição semestral**, propina (mensal, com vencimento num **dia fixo**, por defeito o dia 10), emolumentos (declaração, certificado, exame de recorrência, 2.ª via de cartão). O preço pode depender da **categoria do estudante** (regular, bolseiro, funcionário, estrangeiro, transferido), como no Frappe Education. | D |
 | RF-81 | Gerar as cobranças do ano para cada estudante matriculado, com vencimentos. | D |
 | RF-82 | Multa automática por atraso (percentagem ou valor fixo, configurável). | E |
 | RF-83 | Bolsas e descontos (percentagem ou valor, por estudante, com aprovação). | E |
@@ -197,7 +197,7 @@ Os valores entre parênteses são os de origem; mudam-se em Configuração para 
 
 | Código | Regra |
 |---|---|
-| RN-01 | A escala de classificação é de 0 a 20 valores; a aprovação é com 10 ou mais (configurável). |
+| RN-01 | A escala de classificação é configurável por **intervalos** (0 a 20 de origem), cada um com o seu grau; a aprovação é com 10 ou mais. Os intervalos começam em 0, não se sobrepõem nem deixam falhas e chegam ao máximo (ver `App\Support\Escala`). |
 | RN-02 | Ensino superior — média de frequência: abaixo de 10 → **excluído**; de 10 a 13 → **admitido a exame**; 14 ou mais → **dispensado** do exame (limites configuráveis). |
 | RN-03 | Nota final = nota do exame, ou combinação da frequência com o exame (pesos configuráveis). Reprovado no exame normal → pode ir a **recorrência** (com emolumento). A época **especial** abre-se para os casos previstos no regulamento (ex.: finalistas, trabalhadores-estudantes). |
 | RN-04 | Assiduidade abaixo do mínimo (75 %) → excluído por faltas, seja qual for a nota. |

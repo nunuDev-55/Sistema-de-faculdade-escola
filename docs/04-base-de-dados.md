@@ -201,6 +201,7 @@ erDiagram
         varchar email
         varchar foto
         text necessidades_especiais
+        varchar categoria "regular, bolseiro, funcionario, estrangeiro, transferido"
         varchar estado "activo, suspenso, desistente, transferido, graduado"
         text nota_privada
     }
@@ -354,6 +355,7 @@ erDiagram
         bigint matricula_id FK
         bigint periodo_id FK
         varchar estado "pre_inscricao, confirmada, anulada"
+        varchar estado_facturacao "por_gerar, geradas, falhou"
         datetime confirmada_em
     }
     inscricoes {
@@ -415,6 +417,38 @@ erDiagram
     }
 ```
 
+## 5a. Escala de classificação
+
+A escala é uma entidade com intervalos (padrão do Frappe Education, ver [08](08-estudo-sistemas-academicos.md)), não valores soltos no código. O grau de uma nota é o do intervalo em que cai; os intervalos começam em 0, são contíguos e chegam ao máximo.
+
+```mermaid
+erDiagram
+    escalas_classificacao ||--o{ escala_intervalos : "escala_id"
+    cursos |o--o{ escalas_classificacao : "escala por omissao"
+    escalas_classificacao {
+        bigint id PK
+        varchar nome "0-20, 0-100"
+        decimal maxima
+        tinyint casas_decimais
+        decimal minima_aprovacao
+        decimal minimo_admissao_exame
+        decimal minimo_dispensa_exame
+        tinyint assiduidade_minima
+        tinyint activa
+    }
+    escala_intervalos {
+        bigint id PK
+        bigint escala_id FK
+        decimal minimo
+        decimal maximo
+        varchar grau "Reprovado, Suficiente, Bom, Muito Bom, Excelente"
+        decimal pontos "GPA, opcional"
+        tinyint conta_creditos
+    }
+```
+
+O método de avaliação (média simples ou ponderada por créditos) guarda-se no plano curricular, com o do tipo de instituição como omissão (padrão do OpenEduCat, `op.course.evaluation_type`).
+
 ## 6. Finanças do estudante
 
 Segue o modelo de facturação do nsERP: a **cobrança** faz o papel da factura (linhas com o serviço e o valor) e liga-se aos pagamentos por uma tabela intermédia com o valor abatido.
@@ -444,6 +478,8 @@ erDiagram
         bigint ano_lectivo_id FK
         bigint servico_id FK
         bigint curso_id FK "vazio = todos"
+        varchar categoria "vazio = todas (regular, bolseiro...)"
+        varchar componente "matricula, propina, emolumento"
         decimal valor
         varchar periodicidade "unica, mensal, semestral"
         tinyint prestacoes
