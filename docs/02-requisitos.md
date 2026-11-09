@@ -45,7 +45,7 @@ Uma aplicação web para uma instituição de ensino gerir, num só sítio, **o 
 |---|---|---|
 | RF-01 | Configurar a instituição: nome, sigla, NUIT, alvará / decreto de criação, morada, contactos, logótipo, cores, tipo de instituição. | D |
 | RF-02 | Gerir utilizadores internos, perfis e a matriz de permissões; activar e desactivar contas. | D |
-| RF-03 | Entrada com senha e verificação em dois passos (código do telemóvel) para o pessoal. | D |
+| RF-03 | Entrada com senha e verificação em dois passos (código do telemóvel) para o pessoal. Os estudantes entram com o **número de estudante**. A senha tem **validade** configurável e o sistema obriga a mudá-la quando caduca (como no eDondzo). | D |
 | RF-04 | Registar em auditoria quem fez o quê e quando, com os valores antes e depois. | D |
 | RF-05 | Cópias de segurança da base de dados, criadas e descarregadas em Administração. | D |
 | RF-06 | Definir a numeração dos documentos (n.º de estudante, recibos, declarações, certificados) por série e ano. | D |
@@ -62,6 +62,7 @@ Uma aplicação web para uma instituição de ensino gerir, num só sítio, **o 
 | RF-14 | Definir precedências entre disciplinas (só se inscreve em B depois de aprovar A). | E |
 | RF-15 | Gerir anos lectivos e períodos (semestres / trimestres) com datas de inscrição, aulas, avaliações e exames. | D |
 | RF-16 | Gerir salas (capacidade, tipo: sala, laboratório, anfiteatro). | E |
+| RF-17 | Gerir **delegações e campus**. Cada matrícula indica o curso, o **regime** (turno: manhã, tarde, noite), a delegação e o campus (como no eDondzo). | D |
 
 ### 3.3 Candidaturas e admissão
 
@@ -76,7 +77,7 @@ Uma aplicação web para uma instituição de ensino gerir, num só sítio, **o 
 
 | Código | Requisito | Prio. |
 |---|---|---|
-| RF-30 | Ficha do estudante: dados pessoais, documento de identificação, NUIT (opcional), contactos, morada, foto, necessidades especiais, número de estudante gerado pelo sistema. | D |
+| RF-30 | Ficha do estudante: dados pessoais, documento de identificação, NUIT (opcional), contactos, morada (**Província → Distrito → Localidade**, em cascata), foto, necessidades especiais, número de estudante gerado pelo sistema. | D |
 | RF-31 | Separadores da ficha: Dados · Matrículas · Inscrições · Notas · Presenças · Finanças · Documentos · Notas internas. | D |
 | RF-32 | Associar um ou mais encarregados a um estudante (parentesco, contacto principal); um encarregado pode ter vários educandos. | D |
 | RF-33 | Importar estudantes de um ficheiro Excel com modelo, pré-visualização e confirmação (como no nsERP). | E |
@@ -93,6 +94,8 @@ Uma aplicação web para uma instituição de ensino gerir, num só sítio, **o 
 | RF-44 | Pedido de inscrição online pelo estudante, aprovado pela secretaria ou pelo director de curso. | E |
 | RF-45 | Mudar o estado da matrícula: activa, suspensa, anulada, transferida, concluída. | D |
 | RF-46 | Equivalências e creditação de disciplinas feitas noutra instituição. | P |
+| RF-47 | **Inscrição semestral**: a cada semestre o estudante renova a inscrição, que tem código, estado (pré-inscrição → confirmada), **taxa de inscrição** e as **disciplinas em atraso** que pode repetir (como no eDondzo). | D |
+| RF-48 | **Comprovativo de inscrição** em PDF, com reimpressão (**2.ª via**) a qualquer momento. | D |
 
 ### 3.6 Docentes e distribuição de serviço
 
@@ -109,16 +112,17 @@ Uma aplicação web para uma instituição de ensino gerir, num só sítio, **o 
 | RF-60 | O docente regista o sumário e as presenças de cada aula (presente, falta, atraso, falta justificada). | D |
 | RF-61 | Justificar faltas com motivo e documento. | E |
 | RF-62 | Percentagem de assiduidade por estudante e disciplina; aviso quando se aproxima do limite. | E |
+| RF-63 | O docente anexa **materiais** a cada aula (ficheiros, ligações); o estudante vê a lista das aulas e descarrega-os no portal. | E |
 
 ### 3.8 Avaliação e pautas
 
 | Código | Requisito | Prio. |
 |---|---|---|
 | RF-70 | Definir a escala (0–20 por defeito), as casas decimais e o arredondamento. | D |
-| RF-71 | Definir o plano de avaliação de cada disciplina na turma: componentes (testes, trabalhos, exame), pesos e datas. A soma dos pesos tem de dar 100 %. | D |
+| RF-71 | Definir o plano de avaliação de cada disciplina na turma: componentes (testes, trabalhos, exame), pesos e datas. A soma dos pesos tem de dar 100 %. Modelo de origem: **2 avaliações + 2 trabalhos** (o do eDondzo). | D |
 | RF-72 | O docente lança as notas de cada componente num ecrã tipo folha (teclado, colar do Excel). | D |
 | RF-73 | O sistema calcula a média de frequência e a situação (excluído, admitido a exame, dispensado) segundo as regras da instituição. | D |
-| RF-74 | Pautas de frequência, de exame normal e de recorrência: rascunho → submetida pelo docente → validada pelo director de curso → publicada → fechada. | D |
+| RF-74 | Pautas de frequência e de exame (épocas **Normal, Recorrência e Especial**): rascunho → submetida pelo docente → validada pelo director de curso → publicada → fechada. | D |
 | RF-75 | Revisão de nota (pedido do estudante, decisão, nova nota com motivo) sem apagar a anterior. | E |
 | RF-76 | Ensino geral: médias por trimestre, média anual e decisão de passagem de classe (conselho de notas). | D |
 | RF-77 | Créditos acumulados e média do curso (ponderada pelos créditos). | D |
@@ -128,15 +132,16 @@ Uma aplicação web para uma instituição de ensino gerir, num só sítio, **o 
 
 | Código | Requisito | Prio. |
 |---|---|---|
-| RF-80 | Tabela de preços por ano lectivo: matrícula, propina (mensal / semestral), emolumentos (declaração, certificado, exame de recorrência, 2.ª via de cartão). | D |
+| RF-80 | Tabela de preços por ano lectivo: matrícula, **taxa de inscrição semestral**, propina (mensal, com vencimento num **dia fixo**, por defeito o dia 10), emolumentos (declaração, certificado, exame de recorrência, 2.ª via de cartão). | D |
 | RF-81 | Gerar as cobranças do ano para cada estudante matriculado, com vencimentos. | D |
 | RF-82 | Multa automática por atraso (percentagem ou valor fixo, configurável). | E |
 | RF-83 | Bolsas e descontos (percentagem ou valor, por estudante, com aprovação). | E |
 | RF-84 | Registar pagamentos parciais ou totais (numerário, banco, M-Pesa, e-Mola, POS) e emitir recibo numerado em A4 / PDF. | D |
-| RF-85 | Conta corrente do estudante: o que deve, o que pagou, o que está vencido. | D |
+| RF-85 | Conta corrente do estudante: **dívida actual**, **saldo dos adiantamentos** (pagamentos antecipados) e **extracto** por ano e semestre (cobrança, vencimento, valor, data do pagamento, valor pago, dívida). | D |
 | RF-86 | Bloqueios configuráveis por dívida: inscrição, ver notas, pedir documentos. | E |
 | RF-87 | Lista de devedores e lembretes por e-mail / SMS / WhatsApp. | E |
-| RF-88 | Pagamento online por referência (M-Pesa, e-Mola, banco) com confirmação automática. | F |
+| RF-88 | **Referência bancária por cobrança**: cada cobrança recebe uma referência única (entidade da instituição + referência + montante + data limite), que o estudante vê no portal e paga no banco, ATM ou banca móvel. A tesouraria carrega o ficheiro do banco e o sistema dá baixa sozinho (como no eDondzo). | D |
+| RF-89 | Pagamento online com confirmação imediata (M-Pesa, e-Mola). | F |
 
 ### 3.10 Documentos académicos e requerimentos
 
@@ -146,12 +151,13 @@ Uma aplicação web para uma instituição de ensino gerir, num só sítio, **o 
 | RF-91 | Cada documento emitido tem número, data, assinatura e um código QR que confirma a autenticidade numa página pública. | E |
 | RF-92 | O estudante pede o documento no portal; o pedido gera o emolumento e segue: pedido → pago → em preparação → pronto → entregue. | E |
 | RF-93 | Boletim de notas (ensino geral) e pauta impressa por turma e disciplina. | D |
+| RF-94 | **Inscrição na graduação**: os finalistas inscrevem-se na cerimónia; a secretaria confere, reimprime e tira a lista. | P |
 
 ### 3.11 Portais
 
 | Código | Requisito | Prio. |
 |---|---|---|
-| RF-100 | Portal do estudante: horário, disciplinas, notas publicadas, presenças, conta corrente, recibos, pedidos de documentos, avisos. | D |
+| RF-100 | Portal do estudante, com os mesmos passos do eDondzo: **Inscrição · Notas de Frequência · Exames · Situação Financeira (extracto e referências) · Plano Curricular · Dados Pessoais**, mais horário, presenças, materiais das aulas, recibos, pedidos de documentos e avisos. Filtros por Ano Lectivo e Semestre. | D |
 | RF-101 | Portal do encarregado: o mesmo para cada educando, à escolha. | D |
 | RF-102 | Portal do candidato: candidatura, documentos, estado e resultado. | E |
 | RF-103 | Site público com os cursos, notícias e o formulário de candidatura (como o site do nsERP). | P |
@@ -161,6 +167,7 @@ Uma aplicação web para uma instituição de ensino gerir, num só sítio, **o 
 | Código | Requisito | Prio. |
 |---|---|---|
 | RF-110 | Avisos para um público (todos, um curso, uma turma, os docentes, os devedores), mostrados no portal e enviados por e-mail. | E |
+| RF-115 | **SMS** a um destinatário, a todos, por perfil, por curso ou aos candidatos admitidos. | E |
 | RF-111 | Painel inicial por perfil: matrículas do ano, inscrições pendentes, pautas por publicar, propinas recebidas e vencidas. | D |
 | RF-112 | Relatórios: estudantes por curso / classe / sexo / idade, aproveitamento por disciplina e turma, taxa de aprovação, assiduidade, receitas e dívidas. | E |
 | RF-113 | Exportar qualquer lista para Excel. | D |
@@ -192,7 +199,7 @@ Os valores entre parênteses são os de origem; mudam-se em Configuração para 
 |---|---|
 | RN-01 | A escala de classificação é de 0 a 20 valores; a aprovação é com 10 ou mais (configurável). |
 | RN-02 | Ensino superior — média de frequência: abaixo de 10 → **excluído**; de 10 a 13 → **admitido a exame**; 14 ou mais → **dispensado** do exame (limites configuráveis). |
-| RN-03 | Nota final = nota do exame, ou combinação da frequência com o exame (pesos configuráveis). Reprovado no exame normal → pode ir a **recorrência** (com emolumento). |
+| RN-03 | Nota final = nota do exame, ou combinação da frequência com o exame (pesos configuráveis). Reprovado no exame normal → pode ir a **recorrência** (com emolumento). A época **especial** abre-se para os casos previstos no regulamento (ex.: finalistas, trabalhadores-estudantes). |
 | RN-04 | Assiduidade abaixo do mínimo (75 %) → excluído por faltas, seja qual for a nota. |
 | RN-05 | Só se inscreve numa disciplina quem aprovou as precedentes e não ultrapassa o limite de créditos do período (configurável). |
 | RN-06 | Os créditos seguem o SNATCA (1 crédito ≈ 25–30 horas de trabalho do estudante); confirmar com o regulamento da instituição. |
@@ -205,6 +212,8 @@ Os valores entre parênteses são os de origem; mudam-se em Configuração para 
 | RN-13 | Um pagamento abate as cobranças mais antigas primeiro, salvo indicação em contrário; um recibo emitido só se anula com outro documento. |
 | RN-14 | Com dívida vencida acima do limite configurado, o estudante não se inscreve, não vê as notas ou não pede documentos (cada bloqueio liga-se em separado). |
 | RN-15 | Um plano curricular com estudantes matriculados não se altera; cria-se uma versão nova. Cada estudante fica no plano em que entrou. |
+| RN-16 | O portal só mostra notas e situações de **pautas publicadas**. Antes disso a disciplina aparece "Por lançar", nunca "Excluído" ou "Reprovado" (problema visto no eDondzo). |
+| RN-17 | Por semestre há uma taxa de inscrição e as propinas mensais; um pagamento acima do devido fica como **adiantamento** e abate a próxima cobrança. |
 
 ## 6. Fora do âmbito (1.ª versão)
 

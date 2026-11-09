@@ -41,6 +41,7 @@ erDiagram
     disciplinas ||--o{ precedencias : "disciplina_id"
     disciplinas ||--o{ precedencias : "precedente_id"
     anos_lectivos ||--o{ periodos_lectivos : "ano_lectivo_id"
+    delegacoes ||--o{ campus : "delegacao_id"
     unidades_organicas {
         bigint id PK
         bigint unidade_pai_id FK
@@ -87,6 +88,18 @@ erDiagram
         tinyint periodo "semestre ou 0 = anual"
         tinyint obrigatoria
         tinyint nuclear "conta para a passagem de classe"
+    }
+    delegacoes {
+        bigint id PK
+        varchar codigo
+        varchar nome "SEDE, Delegacao da Beira"
+        varchar provincia
+    }
+    campus {
+        bigint id PK
+        bigint delegacao_id FK
+        varchar nome
+        varchar morada
     }
     precedencias {
         bigint id PK
@@ -239,6 +252,7 @@ erDiagram
     leccionacoes ||--o{ horarios : "leccionacao_id"
     salas ||--o{ horarios : "sala_id"
     leccionacoes ||--o{ aulas : "leccionacao_id"
+    aulas ||--o{ materiais_aula : "aula_id"
     turmas {
         bigint id PK
         bigint periodo_id FK
@@ -287,6 +301,13 @@ erDiagram
         text sumario
         bigint registada_por FK
     }
+    materiais_aula {
+        bigint id PK
+        bigint aula_id FK
+        varchar titulo
+        varchar ficheiro
+        varchar ligacao
+    }
 ```
 
 ## 5. Matrícula, inscrição, presenças e avaliação
@@ -297,7 +318,11 @@ erDiagram
     cursos ||--o{ matriculas : "curso_id"
     planos_curriculares ||--o{ matriculas : "plano_id"
     anos_lectivos ||--o{ matriculas : "ano_lectivo_id"
-    matriculas ||--o{ inscricoes : "matricula_id"
+    matriculas ||--o{ inscricoes_periodo : "matricula_id"
+    periodos_lectivos ||--o{ inscricoes_periodo : "periodo_id"
+    inscricoes_periodo ||--o{ inscricoes : "inscricao_periodo_id"
+    delegacoes ||--o{ matriculas : "delegacao_id"
+    campus ||--o{ matriculas : "campus_id"
     leccionacoes ||--o{ inscricoes : "leccionacao_id"
     aulas ||--o{ presencas : "aula_id"
     inscricoes ||--o{ presencas : "inscricao_id"
@@ -316,14 +341,26 @@ erDiagram
         bigint plano_id FK
         bigint ano_lectivo_id FK
         tinyint ano_curricular "ou classe"
+        varchar regime "manha, tarde, noite"
+        bigint delegacao_id FK
+        bigint campus_id FK
         varchar estado "rascunho, activa, suspensa, anulada, transferida, concluida"
         varchar resultado "transita, nao_transita, graduado"
         date confirmada_em
     }
+    inscricoes_periodo {
+        bigint id PK
+        varchar codigo "comprovativo"
+        bigint matricula_id FK
+        bigint periodo_id FK
+        varchar estado "pre_inscricao, confirmada, anulada"
+        datetime confirmada_em
+    }
     inscricoes {
         bigint id PK
-        bigint matricula_id FK
+        bigint inscricao_periodo_id FK
         bigint leccionacao_id FK
+        tinyint em_atraso "disciplina de semestre anterior"
         varchar estado "inscrito, anulado, aprovado, reprovado, excluido"
         decimal media_frequencia
         decimal nota_final
@@ -339,8 +376,8 @@ erDiagram
     componentes_avaliacao {
         bigint id PK
         bigint leccionacao_id FK
-        varchar nome "Teste 1, Trabalho, Exame"
-        varchar epoca "frequencia, exame, recorrencia"
+        varchar nome "Avaliacao 1, Trabalho 1, Exame"
+        varchar epoca "frequencia, normal, recorrencia, especial"
         tinyint trimestre "ensino geral"
         decimal peso
         date data
@@ -365,7 +402,7 @@ erDiagram
         bigint id PK
         varchar numero
         bigint leccionacao_id FK
-        varchar epoca "frequencia, exame, recorrencia, trimestre_1"
+        varchar epoca "frequencia, normal, recorrencia, especial, trimestre_1"
         varchar estado "rascunho, submetida, validada, publicada, fechada"
         datetime publicada_em
     }
@@ -393,6 +430,7 @@ erDiagram
     estudantes ||--o{ descontos : "estudante_id"
     estudantes ||--o{ pagamentos : "estudante_id"
     cobrancas ||--o{ cobranca_pagamento : "cobranca_id"
+    ficheiros_banco ||--o{ pagamentos : "ficheiro_banco_id"
     pagamentos ||--o{ cobranca_pagamento : "pagamento_id"
     servicos {
         bigint id PK
@@ -422,6 +460,8 @@ erDiagram
         decimal multa
         decimal pago
         date vencimento
+        varchar entidade "entidade bancaria"
+        varchar referencia UK "referencia bancaria"
         varchar estado "aberta, parcial, paga, anulada"
     }
     descontos {
@@ -441,8 +481,18 @@ erDiagram
         decimal valor
         varchar metodo "numerario, banco, mpesa, emola, pos"
         varchar referencia
+        bigint ficheiro_banco_id FK "baixa automatica"
         varchar estado "valido, anulado"
         varchar assinatura
+    }
+    ficheiros_banco {
+        bigint id PK
+        varchar banco
+        date data
+        varchar ficheiro
+        smallint linhas
+        smallint conciliadas
+        bigint carregado_por FK
     }
     cobranca_pagamento {
         bigint cobranca_id FK
@@ -502,6 +552,10 @@ erDiagram
     }
 ```
 
-## 8. Tabelas herdadas do nsERP
+## 8. Tabelas de apoio
+
+`provincias`, `distritos`, `localidades` (morada em cascata), `inscricoes_graduacao` (finalistas inscritos na cerimónia), `sms_enviados` (destinatários, texto, estado).
+
+## 9. Tabelas herdadas do nsERP
 
 Vêm iguais (ou quase) da base do nsERP e não se desenham aqui: `users`, `roles`, `permissions` e tabelas de ligação (Spatie Permission), `activity_log` (Spatie Activitylog), `definicoes`, `numeracoes`, `sessions`, `cache`, `jobs`, `failed_jobs`, `notifications`, `password_reset_tokens`.
