@@ -270,7 +270,7 @@ function LinhaInscricao({
                 )}
             </td>
             <td>
-                <div className="flex flex-wrap justify-end gap-1.5">
+                <div className="flex justify-end gap-1.5 whitespace-nowrap">
                     {confirmada && (
                         <Button asChild size="sm" variant="ghost">
                             <Link href={route('inscricoes.comprovativo', inscricao.id)}>

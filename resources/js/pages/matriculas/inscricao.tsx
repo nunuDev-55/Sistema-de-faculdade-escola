@@ -114,21 +114,34 @@ export default function Inscricao({ matricula, estudante, periodo, disciplinas, 
                 )}
                 {grupos.map((g) => (
                     <Bloco key={g.titulo} titulo={g.titulo}>
-                        <table className="tabela">
+                        {/* No telemóvel fica uma tabela compacta (caixa, disciplina com o código e a situação, créditos) */}
+                        <table className="tabela" data-tabela-fixa="">
                             <thead>
                                 <tr>
                                     <th className="w-10" />
-                                    <th>Código</th>
+                                    <th className="hidden sm:table-cell">Código</th>
                                     <th>Disciplina</th>
-                                    <th className="text-right">Ano</th>
+                                    <th className="hidden text-right sm:table-cell">Ano</th>
                                     <th className="text-right">Créditos</th>
-                                    <th>Situação</th>
+                                    <th className="hidden sm:table-cell">Situação</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {g.linhas.map((d) => {
                                     const escolhida = data.disciplinas.includes(d.disciplina_id);
                                     const podeEscolher = d.estado === 'disponivel' && matricula.activa;
+                                    const situacao = (
+                                        <div className="flex items-center gap-1">
+                                            <Estado cor={COR_SITUACAO[d.estado] ?? 'cinza'}>
+                                                {d.estado === 'disponivel' ? 'Pode inscrever-se' : d.estado_rotulo}
+                                            </Estado>
+                                            {d.estado === 'inscrita' && matricula.activa && d.inscricao_id !== null && (
+                                                <BotaoIcone rotulo={`Anular a inscrição em ${d.nome}`} onClick={() => anular(d)}>
+                                                    <X className="size-4" />
+                                                </BotaoIcone>
+                                            )}
+                                        </div>
+                                    );
                                     return (
                                         <tr
                                             key={d.disciplina_id}
@@ -147,26 +160,23 @@ export default function Inscricao({ matricula, estudante, periodo, disciplinas, 
                                                     />
                                                 ) : null}
                                             </td>
-                                            <td className="font-mono text-[12.5px]">{d.codigo}</td>
+                                            <td className="hidden font-mono text-[12.5px] sm:table-cell">{d.codigo}</td>
                                             <td>
                                                 <span className="font-medium">{d.nome}</span>
                                                 {d.anual && <span className="text-muted-foreground text-xs"> · anual</span>}
                                                 {!d.obrigatoria && <span className="text-muted-foreground text-xs"> · opcional</span>}
-                                                {d.motivo && <div className="text-muted-foreground text-xs">{d.motivo}</div>}
-                                            </td>
-                                            <td className="text-right tabular-nums">{d.ano}.º</td>
-                                            <td className="text-right tabular-nums">{formatCreditos(d.creditos)}</td>
-                                            <td onClick={(e) => e.stopPropagation()}>
-                                                <div className="flex items-center gap-1">
-                                                    <Estado cor={COR_SITUACAO[d.estado] ?? 'cinza'}>
-                                                        {d.estado === 'disponivel' ? 'Pode inscrever-se' : d.estado_rotulo}
-                                                    </Estado>
-                                                    {d.estado === 'inscrita' && matricula.activa && d.inscricao_id !== null && (
-                                                        <BotaoIcone rotulo={`Anular a inscrição em ${d.nome}`} onClick={() => anular(d)}>
-                                                            <X className="size-4" />
-                                                        </BotaoIcone>
-                                                    )}
+                                                <div className="text-muted-foreground font-mono text-[11.5px] sm:hidden">
+                                                    {d.codigo} · {d.ano}.º ano
                                                 </div>
+                                                {d.motivo && <div className="text-muted-foreground text-xs">{d.motivo}</div>}
+                                                <div className="mt-1 sm:hidden" onClick={(e) => e.stopPropagation()}>
+                                                    {situacao}
+                                                </div>
+                                            </td>
+                                            <td className="hidden text-right tabular-nums sm:table-cell">{d.ano}.º</td>
+                                            <td className="text-right align-top tabular-nums sm:align-middle">{formatCreditos(d.creditos)}</td>
+                                            <td className="hidden sm:table-cell" onClick={(e) => e.stopPropagation()}>
+                                                {situacao}
                                             </td>
                                         </tr>
                                     );
