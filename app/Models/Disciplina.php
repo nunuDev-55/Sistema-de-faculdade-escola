@@ -26,6 +26,9 @@ class Disciplina extends Model
 
     protected $fillable = ['unidade_id', 'codigo', 'nome', 'creditos', 'horas_teoricas', 'horas_praticas', 'activo'];
 
+    /** O mesmo valor de origem da base de dados, para o registo acabado de criar já dizer que está activo. */
+    protected $attributes = ['activo' => true];
+
     protected function casts(): array
     {
         return ['creditos' => 'decimal:1', 'activo' => 'boolean', 'horas_teoricas' => 'integer', 'horas_praticas' => 'integer'];

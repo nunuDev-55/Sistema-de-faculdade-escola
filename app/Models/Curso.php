@@ -34,6 +34,9 @@ class Curso extends Model
 
     protected $fillable = ['unidade_id', 'codigo', 'nome', 'grau', 'duracao_anos', 'director_id', 'activo'];
 
+    /** O mesmo valor de origem da base de dados, para o registo acabado de criar já dizer que está activo. */
+    protected $attributes = ['activo' => true];
+
     protected function casts(): array
     {
         return ['activo' => 'boolean', 'duracao_anos' => 'integer'];
