@@ -39,6 +39,13 @@ class AuditoriaController extends Controller
         'perfis' => 'Perfis e permissões',
     ];
 
+    /** Descrição dos registos que os modelos gravam sozinhos (RegistaAuditoria) */
+    private const EVENTOS = [
+        'created' => 'Criado',
+        'updated' => 'Alterado',
+        'deleted' => 'Apagado',
+    ];
+
     /** Nomes legíveis dos campos alterados */
     private const CAMPOS = [
         'name' => 'Nome',
@@ -135,9 +142,9 @@ class AuditoriaController extends Controller
                 'data' => $a->created_at?->toIso8601String(),
                 'modulo' => self::MODULOS[$a->log_name ?? ''] ?? $a->log_name,
                 'evento' => $a->event,
-                'descricao' => $a->description,
+                'descricao' => self::EVENTOS[$a->description] ?? $a->description,
                 'utilizador' => $a->causer instanceof User ? $a->causer->name : 'Sistema',
-                'registo' => $this->descreverRegisto($a),
+                'registo' => $this->registoQueAcrescenta($a),
                 'alteracoes' => $this->alteracoes($a),
                 'detalhes' => $this->detalhes($a),
             ]);
@@ -153,6 +160,21 @@ class AuditoriaController extends Controller
             'utilizadores' => User::orderBy('name')->get(['id', 'name'])->map(fn (User $u) => ['valor' => (string) $u->id, 'rotulo' => $u->name])->values(),
             'modulos' => collect(self::MODULOS)->map(fn (string $rotulo, string $valor) => ['valor' => $valor, 'rotulo' => $rotulo])->values(),
         ]);
+    }
+
+    /**
+     * O registo, só quando acrescenta alguma coisa: não se repete o número que a descrição já tem
+     * ("Matrícula MT2027/00041 suspensa") nem a própria pessoa quando entrou no sistema.
+     */
+    private function registoQueAcrescenta(Activity $a): ?string
+    {
+        $registo = $this->descreverRegisto($a);
+        if ($registo === null || ($a->subject instanceof User && $a->causer instanceof User && $a->subject->is($a->causer))) {
+            return null;
+        }
+        $identificacao = (string) preg_replace('/^(Matrícula|Inscrição|Perfil) /u', '', $registo);
+
+        return str_contains($a->description, $identificacao) ? null : $registo;
     }
 
     /** O registo a que a acção diz respeito, como as pessoas o reconhecem. */
