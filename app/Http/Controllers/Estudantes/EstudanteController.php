@@ -15,6 +15,7 @@ use App\Models\PeriodoLectivo;
 use App\Models\User;
 use App\Services\EstudanteService;
 use App\Support\Opcoes;
+use App\Support\Pesquisa;
 use App\Support\TipoInstituicao;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -34,7 +35,8 @@ class EstudanteController extends Controller
 
         $estudantes = Estudante::query()
             ->when($q !== '', fn (Builder $query) => $query->where(function (Builder $w) use ($q, $digitos) {
-                $w->where('nome', 'like', "%{$q}%")->orWhere('numero', 'like', "%{$q}%")->orWhere('documento_numero', 'like', "%{$q}%");
+                $termo = Pesquisa::like($q);
+                $w->where('nome', 'like', $termo)->orWhere('numero', 'like', $termo)->orWhere('documento_numero', 'like', $termo);
                 if (strlen($digitos) >= 6) {
                     $w->orWhere('telemovel', 'like', "%{$digitos}%");
                 }

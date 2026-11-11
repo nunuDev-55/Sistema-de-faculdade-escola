@@ -22,7 +22,7 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 | # | Módulo | O que inclui |
 |---|---|---|
 | 1.1 | Esqueleto | **Feito**: Laravel 12 + Inertia + React a partir do nsERP, sem os módulos comerciais; entrada, permissões e perfis de origem, painel e menu por perfil, ecrãs "em construção" por módulo; CI no GitHub |
-| 1.2 | Utilizadores, perfis e permissões | Perfis Direcção, Director de curso, Secretaria, Docente, Tesouraria |
+| 1.2 | Utilizadores, perfis e auditoria | **Feito**: contas da equipa (criar, mudar o perfil, activar e desactivar, nunca ficar sem administrador), matriz de permissões por perfil, perfis novos da instituição, auditoria com filtros por pessoa, módulo e datas. Início com o ano em curso e números reais. Falta a verificação em dois passos |
 | 1.3 | Configuração da instituição | **Feito**: dados, logótipo e cores, tipo de instituição, escala por intervalos, limites de avaliação e de créditos. Falta o ecrã da numeração |
 
 ## Fase 2 — Estrutura académica

@@ -1,20 +1,24 @@
 import AppLayout from '@/layouts/app-layout';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { AlertTriangle, ArrowRight } from 'lucide-react';
+import { AlertTriangle, ArrowRight, CalendarDays } from 'lucide-react';
 
 interface Caixa {
     titulo: string;
     href: string;
     descricao: string;
+    numero?: number;
+    legenda?: string;
+    alerta?: string | null;
 }
 
 interface Props {
     configuracaoEmFalta: string[];
+    calendario: { ano: string; periodo: string | null; inscricoes: string | null } | null;
     caixas: Caixa[];
 }
 
-export default function Dashboard({ configuracaoEmFalta, caixas }: Props) {
+export default function Dashboard({ configuracaoEmFalta, calendario, caixas }: Props) {
     const { auth, instituicao } = usePage<SharedData>().props;
 
     return (
@@ -27,6 +31,14 @@ export default function Dashboard({ configuracaoEmFalta, caixas }: Props) {
                     {instituicao.nome}
                     {auth.perfil && ` · ${auth.perfil}`}
                 </p>
+                {calendario && (
+                    <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13.5px]">
+                        <CalendarDays className="text-muted-foreground size-4" />
+                        <span className="font-medium">Ano lectivo {calendario.ano}</span>
+                        {calendario.periodo && <span>· {calendario.periodo} a decorrer</span>}
+                        {calendario.inscricoes && <span className="text-muted-foreground">· {calendario.inscricoes}</span>}
+                    </p>
+                )}
             </div>
 
             {configuracaoEmFalta.length > 0 && (
@@ -57,7 +69,22 @@ export default function Dashboard({ configuracaoEmFalta, caixas }: Props) {
                                 <span className="text-[15px] font-semibold">{caixa.titulo}</span>
                                 <ArrowRight className="text-muted-foreground size-4 transition-transform group-hover:translate-x-0.5" />
                             </div>
-                            <p className="text-muted-foreground mt-1 text-[13px]">{caixa.descricao}</p>
+                            {caixa.numero !== undefined ? (
+                                <p className="mt-2 flex items-baseline gap-2">
+                                    <span className="text-[26px] leading-none font-semibold tabular-nums">
+                                        {caixa.numero.toLocaleString('pt-PT')}
+                                    </span>
+                                    <span className="text-muted-foreground text-[13px]">{caixa.legenda}</span>
+                                </p>
+                            ) : (
+                                <p className="text-muted-foreground mt-1 text-[13px]">{caixa.descricao}</p>
+                            )}
+                            {caixa.alerta && (
+                                <p className="mt-2 flex items-center gap-1.5 text-[12.5px] text-amber-800 dark:text-amber-300">
+                                    <AlertTriangle className="size-3.5 shrink-0" />
+                                    {caixa.alerta}
+                                </p>
+                            )}
                         </Link>
                     ))}
                 </div>

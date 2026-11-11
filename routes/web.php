@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Administracao\AuditoriaController;
 use App\Http\Controllers\Administracao\ConfiguracaoController;
+use App\Http\Controllers\Administracao\PerfilController;
+use App\Http\Controllers\Administracao\UtilizadorController;
 use App\Http\Controllers\Estrutura\CalendarioController;
 use App\Http\Controllers\Estrutura\CursoController;
 use App\Http\Controllers\Estrutura\DisciplinaController;
@@ -81,6 +84,23 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('matriculas/{matricula}/inscricao/{periodo}', [InscricaoController::class, 'create'])->name('inscricoes.create');
         Route::post('matriculas/{matricula}/inscricao/{periodo}', [InscricaoController::class, 'store'])->name('inscricoes.store');
         Route::delete('inscricoes/{inscricao}', [InscricaoController::class, 'destroy'])->name('inscricoes.destroy');
+    });
+
+    // Administração: contas da equipa, perfis e permissões, auditoria (do nsERP)
+    Route::prefix('administracao')->group(function () {
+        Route::get('utilizadores', [UtilizadorController::class, 'index'])->middleware('can:utilizadores.ver')->name('utilizadores.index');
+        Route::post('utilizadores', [UtilizadorController::class, 'store'])->middleware('can:utilizadores.gerir')->name('utilizadores.store');
+        Route::put('utilizadores/{utilizador}', [UtilizadorController::class, 'update'])->middleware('can:utilizadores.gerir')->name('utilizadores.update');
+        Route::post('utilizadores/{utilizador}/estado', [UtilizadorController::class, 'alternarEstado'])->middleware('can:utilizadores.desactivar')->name('utilizadores.estado');
+
+        Route::middleware('can:perfis.gerir')->group(function () {
+            Route::get('perfis', [PerfilController::class, 'index'])->name('perfis.index');
+            Route::post('perfis', [PerfilController::class, 'store'])->name('perfis.store');
+            Route::put('perfis/{perfil}', [PerfilController::class, 'update'])->name('perfis.update');
+            Route::delete('perfis/{perfil}', [PerfilController::class, 'destroy'])->name('perfis.destroy');
+        });
+
+        Route::get('auditoria', [AuditoriaController::class, 'index'])->middleware('can:auditoria.ver')->name('auditoria.index');
     });
 
     // Administração → Configuração: dados da instituição e regras de avaliação
