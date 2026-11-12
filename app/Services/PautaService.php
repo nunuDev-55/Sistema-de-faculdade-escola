@@ -69,7 +69,7 @@ class PautaService
         DB::transaction(function () use ($leccionacao, $componentes) {
             $existentes = $leccionacao->componentes()->get()->keyBy('id');
             $manter = [];
-            foreach (array_values($componentes) as $i => $c) {
+            foreach ($componentes as $i => $c) {
                 $dados = ['nome' => trim($c['nome']), 'peso' => $c['peso'], 'data' => $c['data'] ?? null, 'ordem' => $i + 1];
                 $id = $c['id'] ?? null;
                 $componente = $id !== null ? $existentes->get($id) : null;
