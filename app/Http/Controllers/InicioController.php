@@ -26,12 +26,12 @@ class InicioController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
-        $ano = $this->anoEmCurso();
-        $periodo = $ano?->periodos->first(fn (PeriodoLectivo $p) => now()->between($p->inicio->copy()->startOfDay(), $p->fim->copy()->endOfDay()));
+        $ano = AnoLectivo::emCurso();
+        $periodo = $ano?->periodoEmCurso();
 
         $caixas = [];
         foreach (Modulos::LISTA as $slug => $modulo) {
-            if ($user->can($modulo['permissao'])) {
+            if ($user->canAny($modulo['permissoes'] ?? [$modulo['permissao']])) {
                 $caixas[] = [
                     'titulo' => $modulo['titulo'],
                     'href' => $modulo['href'],
@@ -50,16 +50,6 @@ class InicioController extends Controller
             ],
             'caixas' => $caixas,
         ]);
-    }
-
-    /** O ano lectivo que está a decorrer hoje; se nenhum, o aberto; se nenhum, o mais recente. */
-    private function anoEmCurso(): ?AnoLectivo
-    {
-        $hoje = now()->toDateString();
-
-        return AnoLectivo::with('periodos')->where('inicio', '<=', $hoje)->where('fim', '>=', $hoje)->orderByDesc('inicio')->first()
-            ?? AnoLectivo::with('periodos')->where('estado', 'aberto')->orderByDesc('inicio')->first()
-            ?? AnoLectivo::with('periodos')->orderByDesc('inicio')->first();
     }
 
     private function prazoInscricoes(PeriodoLectivo $periodo): ?string

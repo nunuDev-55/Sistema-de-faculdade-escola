@@ -51,7 +51,9 @@ class PerfilController extends Controller
             ['nome' => 'nome do perfil'],
         );
 
-        $role = Role::create(['name' => trim((string) $dados['nome']), 'guard_name' => 'web']);
+        // new + save (e não Role::create, que devolve o contrato do Spatie e não o modelo que a auditoria pede)
+        $role = new Role(['name' => trim((string) $dados['nome']), 'guard_name' => 'web']);
+        $role->save();
         activity('perfis')->performedOn($role)->event('created')->log("Perfil criado: {$role->name}");
 
         return back()->with('sucesso', "Perfil {$role->name} criado. Escolha agora as suas permissões.");

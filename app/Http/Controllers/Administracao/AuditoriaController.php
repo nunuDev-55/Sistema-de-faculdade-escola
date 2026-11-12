@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\AnoLectivo;
 use App\Models\Curso;
 use App\Models\Disciplina;
+use App\Models\Docente;
 use App\Models\Encarregado;
 use App\Models\Estudante;
 use App\Models\InscricaoPeriodo;
 use App\Models\Matricula;
 use App\Models\PeriodoLectivo;
 use App\Models\PlanoCurricular;
+use App\Models\Sala;
+use App\Models\Turma;
 use App\Models\UnidadeOrganica;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -35,6 +38,7 @@ class AuditoriaController extends Controller
         'estudantes' => 'Estudantes e encarregados',
         'matriculas' => 'Matrículas',
         'inscricoes' => 'Inscrições',
+        'docencia' => 'Docentes e turmas',
         'utilizadores' => 'Utilizadores',
         'perfis' => 'Perfis e permissões',
     ];
@@ -93,6 +97,10 @@ class AuditoriaController extends Controller
         'encarregado' => 'Encarregado',
         'parentesco' => 'Parentesco',
         'ip' => 'IP',
+        'capacidade' => 'Lotação',
+        'grau_academico' => 'Grau académico',
+        'regime' => 'Regime',
+        'user_id' => 'Conta de acesso',
     ];
 
     /** Nomes legíveis das definições gravadas em Configuração (chaves da tabela definicoes) */
@@ -194,6 +202,9 @@ class AuditoriaController extends Controller
             $s instanceof Disciplina => "{$s->codigo} · {$s->nome}",
             $s instanceof UnidadeOrganica => $s->nome,
             $s instanceof AnoLectivo => 'Ano lectivo '.$s->nome,
+            $s instanceof Turma => 'Turma '.$s->designacao().' de '.$s->curso->nome,
+            $s instanceof Docente => $s->nome,
+            $s instanceof Sala => 'Sala '.$s->codigo,
             $s instanceof PeriodoLectivo => $s->nome().' de '.$s->ano->nome,
             default => is_string($perfil = $this->propriedades($a)->get('perfil')) ? 'Perfil '.$perfil : null,
         };

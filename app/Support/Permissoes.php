@@ -62,6 +62,7 @@ final class Permissoes
         'docencia' => [
             'label' => 'Docentes, horários e aulas',
             'permissoes' => [
+                'turmas.ver' => 'Ver turmas, docentes e a distribuição de serviço',
                 'docentes.gerir' => 'Gerir docentes',
                 'distribuicao.gerir' => 'Distribuir o serviço docente',
                 'horarios.gerir' => 'Montar horários',
@@ -149,21 +150,21 @@ final class Permissoes
         'Direcção' => [
             'estrutura.ver', 'estrutura.aprovar', 'calendario.gerir',
             'candidaturas.ver', 'candidaturas.gerir', 'candidaturas.publicar',
-            'estudantes.ver', 'matriculas.estado', 'docentes.gerir',
+            'estudantes.ver', 'matriculas.estado', 'turmas.ver', 'docentes.gerir',
             'pautas.ver', 'pautas.validar', 'pautas.rever',
             'financas.ver', 'financas.configurar', 'descontos.gerir', 'pagamentos.anular',
             'avisos.enviar', 'sms.enviar', 'auditoria.ver',
         ],
         'Director de curso' => [
             'estrutura.ver', 'estrutura.gerir',
-            'estudantes.ver', 'inscricoes.aprovar', 'turmas.gerir', 'horarios.gerir', 'distribuicao.gerir',
+            'estudantes.ver', 'inscricoes.aprovar', 'turmas.ver', 'turmas.gerir', 'horarios.gerir', 'distribuicao.gerir',
             'presencas.justificar', 'pautas.ver', 'pautas.validar', 'pautas.rever',
         ],
         'Secretaria académica' => [
             'estrutura.ver', 'calendario.gerir',
             'candidaturas.ver', 'candidaturas.gerir',
             'estudantes.ver', 'estudantes.gerir',
-            'matriculas.criar', 'matriculas.estado', 'inscricoes.gerir', 'inscricoes.aprovar', 'turmas.gerir',
+            'matriculas.criar', 'matriculas.estado', 'inscricoes.gerir', 'inscricoes.aprovar', 'turmas.ver', 'turmas.gerir',
             'docentes.gerir', 'horarios.gerir', 'presencas.justificar',
             'pautas.ver', 'pautas.fechar',
             'documentos.ver', 'documentos.emitir', 'avisos.enviar', 'sms.enviar',

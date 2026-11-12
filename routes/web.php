@@ -4,10 +4,14 @@ use App\Http\Controllers\Administracao\AuditoriaController;
 use App\Http\Controllers\Administracao\ConfiguracaoController;
 use App\Http\Controllers\Administracao\PerfilController;
 use App\Http\Controllers\Administracao\UtilizadorController;
+use App\Http\Controllers\Docencia\DocenteController;
+use App\Http\Controllers\Docencia\MinhasTurmasController;
+use App\Http\Controllers\Docencia\TurmaController;
 use App\Http\Controllers\Estrutura\CalendarioController;
 use App\Http\Controllers\Estrutura\CursoController;
 use App\Http\Controllers\Estrutura\DisciplinaController;
 use App\Http\Controllers\Estrutura\PlanoController;
+use App\Http\Controllers\Estrutura\SalaController;
 use App\Http\Controllers\Estrutura\UnidadeController;
 use App\Http\Controllers\Estudantes\EncarregadoController;
 use App\Http\Controllers\Estudantes\EstudanteController;
@@ -15,7 +19,9 @@ use App\Http\Controllers\Estudantes\InscricaoController;
 use App\Http\Controllers\Estudantes\MatriculaController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\ModuloController;
+use App\Models\User;
 use App\Support\Modulos;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // O sistema interno: só a equipa (guarda "web"). Os portais (estudante, encarregado, candidato) e o site
@@ -35,6 +41,7 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('unidades', [UnidadeController::class, 'index'])->name('unidades.index');
         Route::get('planos/{plano}', [PlanoController::class, 'show'])->name('planos.show');
         Route::get('calendario', [CalendarioController::class, 'index'])->name('calendario.index');
+        Route::get('salas', [SalaController::class, 'index'])->name('salas.index');
 
         Route::middleware('can:estrutura.gerir')->group(function () {
             Route::post('cursos', [CursoController::class, 'store'])->name('cursos.store');
@@ -58,6 +65,8 @@ Route::middleware(['auth:web'])->group(function () {
         Route::middleware('can:calendario.gerir')->group(function () {
             Route::post('calendario', [CalendarioController::class, 'store'])->name('calendario.store');
             Route::put('calendario/periodos/{periodo}', [CalendarioController::class, 'actualizarPeriodo'])->name('calendario.periodos.update');
+            Route::post('salas', [SalaController::class, 'store'])->name('salas.store');
+            Route::put('salas/{sala}', [SalaController::class, 'update'])->name('salas.update');
         });
     });
 
@@ -84,6 +93,39 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('matriculas/{matricula}/inscricao/{periodo}', [InscricaoController::class, 'create'])->name('inscricoes.create');
         Route::post('matriculas/{matricula}/inscricao/{periodo}', [InscricaoController::class, 'store'])->name('inscricoes.store');
         Route::delete('inscricoes/{inscricao}', [InscricaoController::class, 'destroy'])->name('inscricoes.destroy');
+    });
+
+    // Docência: turmas, distribuição de serviço e docentes; o docente vê as suas turmas
+    Route::prefix('docencia')->group(function () {
+        Route::get('/', function (Request $request) {
+            /** @var User $user */
+            $user = $request->user();
+            abort_unless($user->can('turmas.ver') || $user->can('aulas.registar'), 403);
+
+            return $user->can('turmas.ver') ? to_route('turmas.index') : to_route('docencia.minhas');
+        })->name('docencia.index');
+        Route::get('minhas-turmas', MinhasTurmasController::class)->middleware('can:aulas.registar')->name('docencia.minhas');
+
+        Route::middleware('can:turmas.ver')->group(function () {
+            Route::get('turmas', [TurmaController::class, 'index'])->name('turmas.index');
+            Route::get('turmas/{turma}', [TurmaController::class, 'show'])->name('turmas.show');
+            Route::get('docentes', [DocenteController::class, 'index'])->name('docentes.index');
+        });
+        Route::middleware('can:turmas.gerir')->controller(TurmaController::class)->group(function () {
+            Route::post('turmas', 'store')->name('turmas.store');
+            Route::put('turmas/{turma}', 'update')->name('turmas.update');
+            Route::delete('turmas/{turma}', 'destroy')->name('turmas.destroy');
+            Route::post('turmas/{turma}/distribuir', 'distribuir')->name('turmas.distribuir');
+            Route::post('turmas/{turma}/estudantes', 'mudarEstudante')->name('turmas.estudantes.mudar');
+        });
+        Route::middleware('can:distribuicao.gerir')->controller(TurmaController::class)->group(function () {
+            Route::post('turmas/{turma}/disciplinas', 'acrescentarDisciplina')->name('turmas.disciplinas.store');
+            Route::put('leccionacoes/{leccionacao}', 'atribuirDocente')->name('leccionacoes.docente');
+        });
+        Route::middleware('can:docentes.gerir')->group(function () {
+            Route::post('docentes', [DocenteController::class, 'store'])->name('docentes.store');
+            Route::put('docentes/{docente}', [DocenteController::class, 'update'])->name('docentes.update');
+        });
     });
 
     // Administração: contas da equipa, perfis e permissões, auditoria (do nsERP)

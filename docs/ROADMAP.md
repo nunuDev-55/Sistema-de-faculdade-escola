@@ -32,15 +32,15 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 | 2.1 | Unidades orgânicas e cursos / classes | **Feito**: unidades orgânicas e cursos com grau e duração |
 | 2.2 | Disciplinas e planos curriculares | **Feito**: versões (rascunho → em vigor → substituído), precedências por plano, créditos, método de avaliação por plano (OpenEduCat) |
 | 2.3 | Anos e períodos lectivos | **Feito**: calendário, prazos de inscrição e exames; geração dos períodos a partir do ano (2 semestres / 3 trimestres, OpenEduCat) |
-| 2.4 | Salas e docentes | Ficha do docente ligada ao utilizador |
+| 2.4 | Salas e docentes | **Feito**: salas com tipo e lotação; ficha do docente (grau, categoria, regime, unidade) ligada à conta com que entra |
 
 ## Fase 3 — Percurso do estudante
 
 | # | Módulo | O que inclui |
 |---|---|---|
 | 3.1 | Estudantes e encarregados | **Feito**: número único por ano de entrada, ficha com separadores, encarregados (um para vários irmãos, pelo telemóvel), pesquisa e filtros. Falta a importação do Excel e a fotografia |
-| 3.2 | Matrícula e inscrição | **Feito**: matrícula no plano em vigor (a renovação mantém o plano em que entrou), suspender / reactivar / anular, inscrição semestral com precedências, disciplinas em atraso e limite de créditos, comprovativo para imprimir; no ensino geral, inscrição anual em todas as disciplinas da classe. Falta a distribuição por turmas (com a oferta lectiva) e o pedido de inscrição no portal |
-| 3.3 | Distribuição de serviço e horários | Sem sobreposições |
+| 3.2 | Matrícula e inscrição | **Feito**: matrícula no plano em vigor (a renovação mantém o plano em que entrou), suspender / reactivar / anular, inscrição semestral com precedências, disciplinas em atraso e limite de créditos, comprovativo para imprimir; no ensino geral, inscrição anual em todas as disciplinas da classe. Falta o pedido de inscrição no portal |
+| 3.3 | Turmas, distribuição de serviço e horários | **Feito em parte**: turmas por curso, ano e semestre (do ano todo no ensino geral) com as disciplinas do plano; docente de cada disciplina em cada turma; estudantes distribuídos por ordem alfabética e lotação, disciplinas em atraso na turma onde são dadas; o docente vê as suas turmas. Falta o horário sem sobreposições |
 | 3.4 | Sumários e presenças | Folha de presenças, justificações, assiduidade |
 
 ## Fase 4 — Avaliação

@@ -12,7 +12,7 @@ namespace App\Support;
  */
 final class Modulos
 {
-    /** @var array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool}> */
+    /** @var array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool, permissoes?: list<string>}> */
     public const LISTA = [
         'candidaturas' => [
             'href' => '/candidaturas',
@@ -41,6 +41,8 @@ final class Modulos
             'href' => '/docencia',
             'titulo' => 'Docentes, horários e aulas',
             'permissao' => 'aulas.registar',
+            'permissoes' => ['turmas.ver', 'aulas.registar'],
+            'feito' => true,
             'descricao' => 'Distribuição de serviço, horários sem sobreposições, sumários, presenças e materiais.',
             'planeado' => ['Distribuição de serviço docente', 'Horário por turma, docente e sala', 'Sumários e presenças por aula', 'Materiais das aulas'],
         ],
@@ -78,7 +80,7 @@ final class Modulos
     /**
      * Módulos de Administração (herdados do nsERP, portam-se na fase 1).
      *
-     * @var array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool}>
+     * @var array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool, permissoes?: list<string>}>
      */
     public const ADMINISTRACAO = [
         'utilizadores' => [
@@ -122,7 +124,7 @@ final class Modulos
         ],
     ];
 
-    /** @return array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool}> */
+    /** @return array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool, permissoes?: list<string>}> */
     public static function todos(): array
     {
         return [...self::LISTA, ...self::ADMINISTRACAO];

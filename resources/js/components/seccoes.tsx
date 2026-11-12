@@ -1,4 +1,5 @@
 import { NavSeccao } from '@/components/erp';
+import { usePode } from '@/hooks/use-pode';
 
 /** Páginas da Estrutura académica */
 export function NavEstrutura() {
@@ -9,9 +10,21 @@ export function NavEstrutura() {
                 { href: '/estrutura/disciplinas', label: 'Disciplinas' },
                 { href: '/estrutura/unidades', label: 'Unidades orgânicas' },
                 { href: '/estrutura/calendario', label: 'Calendário' },
+                { href: '/estrutura/salas', label: 'Salas' },
             ]}
         />
     );
+}
+
+/** Páginas da Docência: cada uma só aparece a quem a pode abrir */
+export function NavDocencia() {
+    const pode = usePode();
+    const itens = [
+        { href: '/docencia/turmas', label: 'Turmas', permissao: 'turmas.ver' },
+        { href: '/docencia/docentes', label: 'Docentes', permissao: 'turmas.ver' },
+        { href: '/docencia/minhas-turmas', label: 'As minhas turmas', permissao: 'aulas.registar' },
+    ].filter((i) => pode(i.permissao));
+    return <NavSeccao itens={itens} />;
 }
 
 /** Páginas da Configuração */
