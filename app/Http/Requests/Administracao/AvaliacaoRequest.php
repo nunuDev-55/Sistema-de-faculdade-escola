@@ -42,6 +42,7 @@ class AvaliacaoRequest extends FormRequest
             'minimo_dispensa_exame' => ['required', 'numeric', 'min:0'],
             'assiduidade_minima' => ['required', 'integer', 'min:0', 'max:100'],
             'limite_creditos' => ['nullable', 'numeric', 'min:1', 'max:120'],
+            'peso_exame' => ['nullable', 'integer', 'min:0', 'max:100'],
             'intervalos' => ['required', 'array', 'min:1', 'max:20'],
             'intervalos.*.min' => ['required', 'numeric', 'min:0'],
             'intervalos.*.max' => ['required', 'numeric', 'min:0'],

@@ -4,6 +4,8 @@ use App\Http\Controllers\Administracao\AuditoriaController;
 use App\Http\Controllers\Administracao\ConfiguracaoController;
 use App\Http\Controllers\Administracao\PerfilController;
 use App\Http\Controllers\Administracao\UtilizadorController;
+use App\Http\Controllers\Avaliacao\AvaliacaoController;
+use App\Http\Controllers\Avaliacao\PautaController;
 use App\Http\Controllers\Docencia\DocenteController;
 use App\Http\Controllers\Docencia\MinhasTurmasController;
 use App\Http\Controllers\Docencia\TurmaController;
@@ -125,6 +127,22 @@ Route::middleware(['auth:web'])->group(function () {
         Route::middleware('can:docentes.gerir')->group(function () {
             Route::post('docentes', [DocenteController::class, 'store'])->name('docentes.store');
             Route::put('docentes/{docente}', [DocenteController::class, 'update'])->name('docentes.update');
+        });
+    });
+
+    // Avaliação: plano de avaliação, notas e pautas. Quem lança e quem vê decide-se na disciplina (PautaService)
+    Route::prefix('pautas')->group(function () {
+        Route::get('/', [PautaController::class, 'index'])->middleware('can:pautas.ver')->name('pautas.index');
+        Route::get('disciplina/{leccionacao}', [AvaliacaoController::class, 'show'])->name('avaliacao.show');
+        Route::put('disciplina/{leccionacao}/plano', [AvaliacaoController::class, 'plano'])->name('avaliacao.plano');
+        Route::put('disciplina/{leccionacao}/notas', [AvaliacaoController::class, 'notas'])->name('avaliacao.notas');
+        Route::put('{pauta}/exame', [AvaliacaoController::class, 'exame'])->name('pautas.exame');
+        Route::post('{pauta}/submeter', [AvaliacaoController::class, 'submeter'])->name('pautas.submeter');
+        Route::get('{pauta}/imprimir', [PautaController::class, 'imprimir'])->name('pautas.imprimir');
+        Route::middleware('can:pautas.validar')->controller(AvaliacaoController::class)->group(function () {
+            Route::post('{pauta}/validar', 'validar')->name('pautas.validar');
+            Route::post('{pauta}/devolver', 'devolver')->name('pautas.devolver');
+            Route::post('{pauta}/publicar', 'publicar')->name('pautas.publicar');
         });
     });
 

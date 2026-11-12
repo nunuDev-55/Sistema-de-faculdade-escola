@@ -47,9 +47,9 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 
 | # | Módulo | O que inclui |
 |---|---|---|
-| 4.1 | Plano de avaliação e lançamento de notas | Escala de classificação por intervalos (Frappe); folha de notas tipo Excel |
-| 4.2 | Pautas | Rascunho → submetida → validada → publicada → fechada; impressão |
-| 4.3 | Exame e recorrência / trimestres e conselho de notas | Os dois tipos de instituição |
+| 4.1 | Plano de avaliação e lançamento de notas | **Feito**: plano de avaliação por disciplina e turma (pesos somam 100 %, modelo 2 testes + 2 trabalhos); folha de notas com a média e a situação ao vivo; F para quem faltou; só o docente da disciplina lança (RN-10) |
+| 4.2 | Pautas | **Feito em parte**: rascunho → submetida → validada → publicada, devolver ao docente com o motivo, número ao publicar, pauta para imprimir; ao publicar, os resultados passam para as inscrições e abrem as precedências. Falta fechar a época |
+| 4.3 | Exame e recorrência / trimestres e conselho de notas | **Feito em parte**: ensino superior com frequência (excluído, admitido, dispensado), exame normal e recorrência, nota final com o peso do exame da Configuração. Falta a época especial e o ensino geral (trimestres e passagem de classe) |
 | 4.4 | Revisões de nota | Sem apagar a anterior |
 
 ## Fase 5 — Finanças

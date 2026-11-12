@@ -11,6 +11,7 @@ use App\Models\Encarregado;
 use App\Models\Estudante;
 use App\Models\InscricaoPeriodo;
 use App\Models\Matricula;
+use App\Models\Pauta;
 use App\Models\PeriodoLectivo;
 use App\Models\PlanoCurricular;
 use App\Models\Sala;
@@ -39,6 +40,7 @@ class AuditoriaController extends Controller
         'matriculas' => 'Matrículas',
         'inscricoes' => 'Inscrições',
         'docencia' => 'Docentes e turmas',
+        'pautas' => 'Notas e pautas',
         'utilizadores' => 'Utilizadores',
         'perfis' => 'Perfis e permissões',
     ];
@@ -124,6 +126,7 @@ class AuditoriaController extends Controller
         'avaliacao.minimo_dispensa_exame' => 'Mínimo para dispensa',
         'avaliacao.assiduidade_minima' => 'Assiduidade mínima',
         'avaliacao.intervalos' => 'Graus da escala',
+        'avaliacao.peso_exame' => 'Peso do exame',
         'inscricao.limite_creditos' => 'Limite de créditos',
     ];
 
@@ -205,6 +208,7 @@ class AuditoriaController extends Controller
             $s instanceof Turma => 'Turma '.$s->designacao().' de '.$s->curso->nome,
             $s instanceof Docente => $s->nome,
             $s instanceof Sala => 'Sala '.$s->codigo,
+            $s instanceof Pauta => 'Pauta '.mb_strtolower(Pauta::EPOCAS[$s->epoca] ?? $s->epoca).' de '.$s->leccionacao->disciplina->nome.' ('.$s->leccionacao->turma->designacao().')',
             $s instanceof PeriodoLectivo => $s->nome().' de '.$s->ano->nome,
             default => is_string($perfil = $this->propriedades($a)->get('perfil')) ? 'Perfil '.$perfil : null,
         };

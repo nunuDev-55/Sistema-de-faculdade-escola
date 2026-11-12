@@ -50,6 +50,7 @@ final class Modulos
             'href' => '/pautas',
             'titulo' => 'Avaliação e pautas',
             'permissao' => 'pautas.ver',
+            'feito' => true,
             'descricao' => 'Plano de avaliação, lançamento de notas, pautas e revisões.',
             'planeado' => ['Plano de avaliação (pesos = 100%)', 'Folha de notas tipo Excel', 'Pauta: rascunho → validada → publicada → fechada', 'Exame, recorrência e especial; revisões de nota'],
         ],

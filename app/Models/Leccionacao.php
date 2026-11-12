@@ -43,6 +43,18 @@ class Leccionacao extends Model
         return $this->belongsTo(Docente::class, 'docente_id');
     }
 
+    /** @return HasMany<ComponenteAvaliacao, $this> */
+    public function componentes(): HasMany
+    {
+        return $this->hasMany(ComponenteAvaliacao::class, 'leccionacao_id')->orderBy('ordem')->orderBy('id');
+    }
+
+    /** @return HasMany<Pauta, $this> */
+    public function pautas(): HasMany
+    {
+        return $this->hasMany(Pauta::class, 'leccionacao_id');
+    }
+
     /**
      * As inscrições dos estudantes nesta disciplina desta turma (só as que não foram anuladas).
      *

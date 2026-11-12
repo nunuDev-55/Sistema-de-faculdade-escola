@@ -56,14 +56,17 @@ export default function MinhasTurmas({ docente, leccionacoes }: Props) {
                                         <th>Turma</th>
                                         <th>Curso</th>
                                         <th className="text-right">Estudantes</th>
+                                        <th className="w-px" />
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {linhas.length === 0 && <LinhaVazia colunas={4} />}
+                                    {linhas.length === 0 && <LinhaVazia colunas={5} />}
                                     {linhas.map((l) => (
                                         <tr key={l.id}>
                                             <td>
-                                                <span className="font-medium">{l.disciplina}</span>
+                                                <Link href={route('avaliacao.show', l.id)} className="font-medium hover:underline">
+                                                    {l.disciplina}
+                                                </Link>
                                                 <div className="text-muted-foreground font-mono text-[11.5px]">{l.codigo}</div>
                                             </td>
                                             <td>
@@ -77,6 +80,14 @@ export default function MinhasTurmas({ docente, leccionacoes }: Props) {
                                             </td>
                                             <td>{l.curso}</td>
                                             <td className="text-right tabular-nums">{l.estudantes}</td>
+                                            <td>
+                                                <Link
+                                                    href={route('avaliacao.show', l.id)}
+                                                    className="text-[13px] whitespace-nowrap underline-offset-2 hover:underline"
+                                                >
+                                                    Notas e pauta
+                                                </Link>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

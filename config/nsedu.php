@@ -40,6 +40,8 @@ return [
         'minimo_dispensa_exame' => (float) env('NSEDU_MINIMO_DISPENSA', 14),
         'assiduidade_minima' => (int) env('NSEDU_ASSIDUIDADE_MINIMA', 75),
         'casas_decimais' => (int) env('NSEDU_CASAS_DECIMAIS', 2),
+        // Nota final de quem vai a exame: média de frequência e nota do exame, com este peso (%) para o exame (RN-03)
+        'peso_exame' => (int) env('NSEDU_PESO_EXAME', 50),
 
         /*
          * Escala de classificação por intervalos (padrão do Frappe Education, ver docs/08-estudo-sistemas-academicos.md).

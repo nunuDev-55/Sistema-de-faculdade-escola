@@ -217,7 +217,15 @@ export default function TurmaFicha({ turma, leccionacoes, estudantes, outrasTurm
                             {leccionacoes.map((l) => (
                                 <tr key={l.id}>
                                     <td className="font-mono text-[12.5px]">{l.codigo}</td>
-                                    <td className="font-medium">{l.disciplina}</td>
+                                    <td className="font-medium">
+                                        {pode('pautas.ver') ? (
+                                            <Link href={route('avaliacao.show', l.id)} className="hover:underline">
+                                                {l.disciplina}
+                                            </Link>
+                                        ) : (
+                                            l.disciplina
+                                        )}
+                                    </td>
                                     <td className="text-right tabular-nums">{formatCreditos(l.creditos)}</td>
                                     <td>
                                         {pode('distribuicao.gerir') ? (

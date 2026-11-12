@@ -91,6 +91,7 @@ class ConfiguracaoController extends Controller
                 'minimo_admissao_exame' => (float) Escala::parametro('minimo_admissao_exame'),
                 'minimo_dispensa_exame' => (float) Escala::parametro('minimo_dispensa_exame'),
                 'assiduidade_minima' => (int) Escala::parametro('assiduidade_minima'),
+                'peso_exame' => (int) Escala::parametro('peso_exame'),
                 'limite_creditos' => RegrasInscricao::limiteCreditos(),
                 'intervalos' => Escala::intervalos(),
             ],
@@ -111,6 +112,7 @@ class ConfiguracaoController extends Controller
             'avaliacao.assiduidade_minima' => (string) (int) $v['assiduidade_minima'],
             'avaliacao.intervalos' => (string) json_encode($intervalos),
             ...(isset($v['limite_creditos']) ? ['inscricao.limite_creditos' => (string) (float) $v['limite_creditos']] : []),
+            ...(isset($v['peso_exame']) ? ['avaliacao.peso_exame' => (string) (int) $v['peso_exame']] : []),
         ], 'Regras de avaliação alteradas');
 
         return back()->with('sucesso', 'Regras de avaliação guardadas.');
