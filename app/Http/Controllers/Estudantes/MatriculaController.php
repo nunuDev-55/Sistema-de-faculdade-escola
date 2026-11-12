@@ -13,6 +13,7 @@ use App\Models\PeriodoLectivo;
 use App\Models\User;
 use App\Services\MatriculaService;
 use App\Support\Opcoes;
+use App\Support\Pesquisa;
 use App\Support\TipoInstituicao;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -38,7 +39,7 @@ class MatriculaController extends Controller
 
         $matriculas = $base
             ->when($estado !== '', fn (Builder $query) => $query->where('estado', $estado))
-            ->when($q !== '', fn (Builder $query) => $query->whereHas('estudante', fn (Builder $e) => $e->where(fn (Builder $w) => $w->where('nome', 'like', "%{$q}%")->orWhere('numero', 'like', "%{$q}%"))))
+            ->when($q !== '', fn (Builder $query) => $query->whereHas('estudante', fn (Builder $e) => $e->where(fn (Builder $w) => $w->where('nome', 'like', Pesquisa::like($q))->orWhere('numero', 'like', Pesquisa::like($q)))))
             ->with(['estudante', 'curso'])
             ->withCount(['inscricoesPeriodo as inscricoes' => fn (Builder $i) => $i->where('estado', 'confirmada')])
             ->orderByDesc('id')
