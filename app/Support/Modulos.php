@@ -58,6 +58,7 @@ final class Modulos
             'href' => '/financas',
             'titulo' => 'Finanças do estudante',
             'permissao' => 'financas.ver',
+            'feito' => true,
             'descricao' => 'Tabela de preços, cobranças, pagamentos, recibos e referências bancárias.',
             'planeado' => ['Taxa de inscrição e propinas mensais', 'Cobranças do ano e conta corrente', 'Pagamentos, adiantamentos e recibos', 'Referência bancária por cobrança e devedores'],
         ],

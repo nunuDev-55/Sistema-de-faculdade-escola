@@ -19,6 +19,7 @@ use App\Http\Controllers\Estudantes\EncarregadoController;
 use App\Http\Controllers\Estudantes\EstudanteController;
 use App\Http\Controllers\Estudantes\InscricaoController;
 use App\Http\Controllers\Estudantes\MatriculaController;
+use App\Http\Controllers\Financas\FinancasController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\ModuloController;
 use App\Models\User;
@@ -144,6 +145,15 @@ Route::middleware(['auth:web'])->group(function () {
             Route::post('{pauta}/devolver', 'devolver')->name('pautas.devolver');
             Route::post('{pauta}/publicar', 'publicar')->name('pautas.publicar');
         });
+    });
+
+    // Finanças do estudante: cobranças, tabela de preços e geração das cobranças do ano
+    Route::middleware('can:financas.ver')->prefix('financas')->controller(FinancasController::class)->group(function () {
+        Route::get('/', 'index')->name('financas.index');
+        Route::get('precos', 'precos')->name('financas.precos');
+        Route::post('precos', 'guardarPreco')->middleware('can:financas.configurar')->name('financas.precos.guardar');
+        Route::delete('precos/{preco}', 'apagarPreco')->middleware('can:financas.configurar')->name('financas.precos.apagar');
+        Route::post('gerar', 'gerar')->middleware('can:cobrancas.gerar')->name('financas.gerar');
     });
 
     // Administração: contas da equipa, perfis e permissões, auditoria (do nsERP)

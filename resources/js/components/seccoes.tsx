@@ -27,6 +27,18 @@ export function NavDocencia() {
     return <NavSeccao itens={itens} />;
 }
 
+/** Páginas das Finanças */
+export function NavFinancas() {
+    return (
+        <NavSeccao
+            itens={[
+                { href: '/financas', label: 'Cobranças' },
+                { href: '/financas/precos', label: 'Tabela de preços' },
+            ]}
+        />
+    );
+}
+
 /** Páginas da Configuração */
 export function NavConfiguracao() {
     return (
@@ -44,3 +56,7 @@ export const numeroCampo = (n: number | null | undefined) => (n === null || n ==
 
 /** Créditos sem casas de dinheiro: 6 → "6", 4.5 → "4,5" */
 export const formatCreditos = (n: number) => (Number.isInteger(n) ? String(n) : String(Math.round(n * 10) / 10).replace('.', ','));
+
+/** Meticais à moçambicana: 1500.5 → "1 500,50 MT" */
+export const formatMT = (valor: string | number) =>
+    `${Number(valor).toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true })} MT`;

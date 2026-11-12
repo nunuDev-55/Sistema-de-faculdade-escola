@@ -56,7 +56,7 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 
 | # | Módulo | O que inclui |
 |---|---|---|
-| 5.1 | Tabela de preços e geração de cobranças | Por ano lectivo e curso |
+| 5.1 | Tabela de preços e geração de cobranças | **Feito**: tabela de preços por ano lectivo (geral ou por curso): taxa de inscrição por período e propina mensal; cobranças geradas uma vez por inscrição, com vencimento no dia de pagamento; totais cobrado, pago e vencido |
 | 5.2 | Pagamentos, recibos e referências bancárias | Parciais, adiantamentos, alocação, recibo assinado (da facturação do nsERP); uma referência por cobrança e baixa pelo ficheiro do banco |
 | 5.3 | Multas, bolsas e descontos, bloqueios por dívida | |
 | 5.4 | Devedores e lembretes | E-mail, depois SMS / WhatsApp |
