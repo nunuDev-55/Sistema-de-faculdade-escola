@@ -23,6 +23,7 @@ class Numeracao
         'cobranca' => ['CB{ano}/{n}', 5],
         'recibo' => ['RC{ano}/{n}', 4],
         'documento' => ['DC{ano}/{n}', 4],
+        'pedido_documento' => ['PD{ano}/{n}', 4],
     ];
 
     /** Nome legível de cada série (Configuração → Numeração). */
@@ -35,6 +36,7 @@ class Numeracao
         'cobranca' => 'Cobranças',
         'recibo' => 'Recibos',
         'documento' => 'Documentos académicos emitidos',
+        'pedido_documento' => 'Pedidos de documentos',
     ];
 
     public function proximo(string $serie, ?int $ano = null): string

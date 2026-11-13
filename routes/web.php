@@ -10,6 +10,7 @@ use App\Http\Controllers\Docencia\DocenteController;
 use App\Http\Controllers\Docencia\MinhasTurmasController;
 use App\Http\Controllers\Docencia\TurmaController;
 use App\Http\Controllers\Documentos\DocumentoController;
+use App\Http\Controllers\Documentos\PedidoController;
 use App\Http\Controllers\Documentos\VerificacaoController;
 use App\Http\Controllers\Estrutura\CalendarioController;
 use App\Http\Controllers\Estrutura\CursoController;
@@ -28,6 +29,7 @@ use App\Http\Controllers\InicioController;
 use App\Http\Controllers\ModuloController;
 use App\Http\Controllers\Portal\EntradaController;
 use App\Http\Controllers\Portal\PainelController;
+use App\Http\Controllers\Portal\PedidoDocumentoController;
 use App\Models\User;
 use App\Support\Modulos;
 use Illuminate\Http\Request;
@@ -172,10 +174,14 @@ Route::middleware(['auth:web'])->group(function () {
     // Documentos académicos: emitidos a partir da ficha do estudante, com número e código de verificação
     Route::middleware('can:documentos.ver')->group(function () {
         Route::get('documentos', [DocumentoController::class, 'index'])->name('documentos.index');
-        Route::get('documentos/{documento}', [DocumentoController::class, 'show'])->name('documentos.show');
+        Route::get('documentos/pedidos', [PedidoController::class, 'index'])->name('pedidos.index');
+        Route::get('documentos/{documento}', [DocumentoController::class, 'show'])->whereNumber('documento')->name('documentos.show');
         Route::middleware('can:documentos.emitir')->group(function () {
             Route::post('estudantes/{estudante}/documentos', [DocumentoController::class, 'store'])->name('documentos.store');
             Route::post('documentos/{documento}/anular', [DocumentoController::class, 'anular'])->name('documentos.anular');
+            Route::post('documentos/pedidos/{pedido}/emitir', [PedidoController::class, 'emitir'])->name('pedidos.emitir');
+            Route::post('documentos/pedidos/{pedido}/recusar', [PedidoController::class, 'recusar'])->name('pedidos.recusar');
+            Route::post('documentos/pedidos/{pedido}/entregar', [PedidoController::class, 'entregar'])->name('pedidos.entregar');
         });
     });
 
@@ -227,6 +233,7 @@ Route::prefix('portal')->name('portal.')->group(function () {
     });
     Route::middleware('auth:estudante')->group(function () {
         Route::get('/', PainelController::class)->name('painel');
+        Route::post('pedidos', [PedidoDocumentoController::class, 'store'])->middleware('throttle:10,1')->name('pedidos.store');
         Route::post('sair', [EntradaController::class, 'destroy'])->name('sair');
     });
 });

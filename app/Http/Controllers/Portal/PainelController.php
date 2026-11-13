@@ -5,13 +5,16 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use App\Models\Cobranca;
 use App\Models\ContaPortal;
+use App\Models\DocumentoEmitido;
 use App\Models\Inscricao;
 use App\Models\InscricaoPeriodo;
 use App\Models\Matricula;
 use App\Models\Pagamento;
+use App\Models\PedidoDocumento;
 use App\Services\PagamentoService;
 use App\Support\Definicoes;
 use App\Support\Dinheiro;
+use App\Support\Opcoes;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -67,6 +70,19 @@ class PainelController extends Controller
                 'pagamentos' => Pagamento::where('estudante_id', $estudante->id)->where('estado', 'valido')->orderByDesc('data')->limit(10)->get()
                     ->map(fn (Pagamento $p) => ['numero' => $p->numero, 'data' => $p->data->toDateString(), 'valor' => $p->valor])->values(),
             ],
+            'pedidos' => PedidoDocumento::with(['cobranca', 'documento'])->where('estudante_id', $estudante->id)->latest('id')->limit(10)->get()
+                ->map(fn (PedidoDocumento $p) => [
+                    'numero' => $p->numero,
+                    'tipo' => $p->nomeTipo(),
+                    'finalidade' => $p->finalidade,
+                    'pedido_em' => $p->created_at->toIso8601String(),
+                    'emolumento' => $p->cobranca?->valor,
+                    'situacao' => $p->situacao(),
+                    'situacao_rotulo' => PedidoDocumento::SITUACOES[$p->situacao()] ?? $p->situacao(),
+                    'motivo_recusa' => $p->motivo_recusa,
+                    'documento_numero' => $p->documento?->numero,
+                ])->values(),
+            'tiposDocumento' => Opcoes::de(DocumentoEmitido::TIPOS),
         ]);
     }
 }

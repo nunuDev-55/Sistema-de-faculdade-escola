@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Um preço da tabela do ano lectivo: a taxa de inscrição de cada período ou a propina mensal, para um curso
- * (ou para todos, com o curso vazio). O preço de um curso vale mais do que o geral.
+ * Um preço da tabela do ano lectivo: a taxa de inscrição de cada período, a propina mensal ou o emolumento de um
+ * documento, para um curso (ou para todos, com o curso vazio). O preço de um curso vale mais do que o geral.
  *
  * @property int $id
  * @property int $ano_lectivo_id
@@ -26,6 +26,17 @@ class Preco extends Model
     public const TIPOS = [
         'inscricao' => 'Taxa de inscrição (por período)',
         'propina' => 'Propina mensal',
+        'doc_declaracao' => 'Emolumento: declaração de matrícula ou de frequência',
+        'doc_historico' => 'Emolumento: histórico escolar',
+        'doc_certificado' => 'Emolumento: certificado de habilitações',
+    ];
+
+    /** O preço (emolumento) de cada tipo de documento. */
+    public const EMOLUMENTOS = [
+        DocumentoEmitido::DECLARACAO_MATRICULA => 'doc_declaracao',
+        DocumentoEmitido::DECLARACAO_FREQUENCIA => 'doc_declaracao',
+        DocumentoEmitido::HISTORICO => 'doc_historico',
+        DocumentoEmitido::CERTIFICADO => 'doc_certificado',
     ];
 
     protected $fillable = ['ano_lectivo_id', 'curso_id', 'tipo', 'valor', 'prestacoes', 'dia_vencimento'];

@@ -1,10 +1,14 @@
-import { Estado } from '@/components/erp';
+import { Estado, type CorEstado } from '@/components/erp';
+import InputError from '@/components/input-error';
 import { formatCreditos } from '@/components/seccoes';
 import { Button } from '@/components/ui/button';
+import { CaixaEscolha } from '@/components/ui/caixa-escolha';
+import { Input } from '@/components/ui/input';
 import { formatData } from '@/lib/format';
-import { Head, router } from '@inertiajs/react';
+import { type Opcao } from '@/types';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { LogOut } from 'lucide-react';
-import { type ReactNode } from 'react';
+import { type FormEvent, type ReactNode } from 'react';
 
 interface Disciplina {
     codigo: string;
@@ -33,6 +37,61 @@ interface Props {
         cobrancas: { descricao: string; vencimento: string; falta: string; vencida: boolean }[];
         pagamentos: { numero: string; data: string; valor: string }[];
     };
+    pedidos: {
+        numero: string;
+        tipo: string;
+        finalidade: string | null;
+        pedido_em: string;
+        emolumento: string | null;
+        situacao: string;
+        situacao_rotulo: string;
+        motivo_recusa: string | null;
+        documento_numero: string | null;
+    }[];
+    tiposDocumento: Opcao[];
+}
+
+const COR_PEDIDO: Record<string, CorEstado> = {
+    aguarda_pagamento: 'laranja',
+    por_emitir: 'azul',
+    emitido: 'verde',
+    entregue: 'cinza',
+    recusado: 'vermelho',
+};
+
+/** Pedir uma declaração, o histórico ou o certificado; o emolumento aparece em "Por pagar". */
+function PedirDocumento({ tipos }: { tipos: Opcao[] }) {
+    const { data, setData, post, processing, errors, reset } = useForm({ tipo: tipos[0]?.valor ?? '', finalidade: '' });
+    const pedir = (e: FormEvent) => {
+        e.preventDefault();
+        post(route('portal.pedidos.store'), { preserveScroll: true, onSuccess: () => reset('finalidade') });
+    };
+    return (
+        <form onSubmit={pedir} className="flex flex-col gap-2 border-b px-4 py-3 sm:flex-row sm:items-start">
+            <div className="flex-1">
+                <CaixaEscolha value={data.tipo} onChange={(e) => setData('tipo', e.target.value)} aria-label="Documento">
+                    {tipos.map((t) => (
+                        <option key={t.valor} value={t.valor}>
+                            {t.rotulo}
+                        </option>
+                    ))}
+                </CaixaEscolha>
+                <InputError message={errors.tipo} className="mt-1" />
+            </div>
+            <div className="flex-1">
+                <Input
+                    value={data.finalidade}
+                    onChange={(e) => setData('finalidade', e.target.value)}
+                    placeholder="Para quê? (opcional)"
+                    aria-label="Finalidade"
+                />
+                <InputError message={errors.finalidade} className="mt-1" />
+            </div>
+            <Button type="submit" disabled={processing}>
+                Pedir
+            </Button>
+        </form>
+    );
 }
 
 const mt = (v: string) => `${Number(v).toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MT`;
@@ -48,8 +107,9 @@ function Caixa({ titulo, children }: { titulo: string; children: ReactNode }) {
 }
 
 /** O portal do estudante: matrículas, disciplinas e notas publicadas, propinas e pagamentos. */
-export default function PainelPortal({ instituicao, estudante, matriculas, financas }: Props) {
+export default function PainelPortal({ instituicao, estudante, matriculas, financas, pedidos, tiposDocumento }: Props) {
     const actual = matriculas[0];
+    const { flash } = usePage<{ flash?: { sucesso?: string } }>().props;
 
     return (
         <div className="bg-muted min-h-screen pb-10">
@@ -70,6 +130,11 @@ export default function PainelPortal({ instituicao, estudante, matriculas, finan
             </header>
 
             <main className="mx-auto flex max-w-3xl flex-col gap-4 px-4 pt-5">
+                {flash?.sucesso && (
+                    <p className="rounded-lg border border-green-300 bg-green-50 px-4 py-2.5 text-[13.5px] text-green-800 dark:border-green-800 dark:bg-green-950/40 dark:text-green-300">
+                        {flash.sucesso}
+                    </p>
+                )}
                 <div>
                     <h1 className="text-[20px] font-semibold">{estudante.nome}</h1>
                     <p className="text-muted-foreground text-[13.5px]">
@@ -121,7 +186,7 @@ export default function PainelPortal({ instituicao, estudante, matriculas, finan
                     )),
                 )}
 
-                <Caixa titulo="Propinas por pagar">
+                <Caixa titulo="Por pagar">
                     {financas.cobrancas.length === 0 ? (
                         <p className="text-muted-foreground px-4 py-4 text-[13.5px]">Não tem nada por pagar.</p>
                     ) : (
@@ -138,6 +203,33 @@ export default function PainelPortal({ instituicao, estudante, matriculas, finan
                                         </div>
                                     </div>
                                     <div className="font-semibold tabular-nums">{mt(c.falta)}</div>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </Caixa>
+
+                <Caixa titulo="Documentos">
+                    <PedirDocumento tipos={tiposDocumento} />
+                    {pedidos.length === 0 ? (
+                        <p className="text-muted-foreground px-4 py-4 text-[13.5px]">
+                            Peça aqui declarações, o histórico ou o certificado. Levanta-os na secretaria.
+                        </p>
+                    ) : (
+                        <ul className="divide-y">
+                            {pedidos.map((p) => (
+                                <li key={p.numero} className="flex items-start justify-between gap-3 px-4 py-2.5 text-[13.5px]">
+                                    <div className="min-w-0">
+                                        <div className="font-medium">{p.tipo}</div>
+                                        <div className="text-muted-foreground text-[12px]">
+                                            <span className="font-mono">{p.numero}</span> · {formatData(p.pedido_em)}
+                                            {p.emolumento && ` · ${mt(p.emolumento)}`}
+                                        </div>
+                                        {p.motivo_recusa && <div className="text-[12px] text-red-700 dark:text-red-400">{p.motivo_recusa}</div>}
+                                    </div>
+                                    <Estado cor={COR_PEDIDO[p.situacao] ?? 'cinza'} className="shrink-0">
+                                        {p.situacao_rotulo}
+                                    </Estado>
                                 </li>
                             ))}
                         </ul>

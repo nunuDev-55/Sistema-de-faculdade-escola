@@ -95,13 +95,16 @@ export function CabecalhoFicha({
 export function NavSeccao({ itens }: { itens: { href: string; label: string }[] }) {
     const { url } = usePage();
     const caminho = url.split('?')[0];
+    const corresponde = (href: string) => caminho === href || caminho.startsWith(href + '/');
+    // O separador mais específico ganha: em /financas/precos fica activo "Tabela de preços", não "Cobranças"
+    const escolhido = itens.filter((i) => corresponde(i.href)).sort((a, b) => b.href.length - a.href.length)[0]?.href;
     return (
         <nav
             className="mb-5 flex [scrollbar-width:none] gap-5 overflow-x-auto overflow-y-hidden border-b [&::-webkit-scrollbar]:hidden"
             aria-label="Secção"
         >
             {itens.map((i) => {
-                const activo = caminho === i.href || caminho.startsWith(i.href + '/');
+                const activo = i.href === escolhido;
                 return (
                     <Link
                         key={i.href}

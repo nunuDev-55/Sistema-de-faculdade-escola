@@ -1,4 +1,5 @@
 import { Bloco, Estado, LinhaVazia, Paginacao, TituloPagina, type Pagina } from '@/components/erp';
+import { NavDocumentos } from '@/components/seccoes';
 import { CaixaEscolha } from '@/components/ui/caixa-escolha';
 import { Input } from '@/components/ui/input';
 import { useFiltros } from '@/hooks/use-filtros';
@@ -38,6 +39,7 @@ export default function Documentos({ documentos, filtros: iniciais, tipos }: Pro
                 titulo="Documentos académicos"
                 descricao="Declarações, históricos e certificados emitidos. Cada um tem número e um código QR que confirma a autenticidade."
             />
+            <NavDocumentos />
             <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center">
                 <CaixaEscolha value={filtros.tipo} onChange={(e) => mudar('tipo', e.target.value)} className="sm:max-w-60" aria-label="Tipo">
                     <option value="">Todos os tipos</option>

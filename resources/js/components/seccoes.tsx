@@ -39,6 +39,18 @@ export function NavFinancas() {
     );
 }
 
+/** Páginas dos Documentos académicos */
+export function NavDocumentos() {
+    return (
+        <NavSeccao
+            itens={[
+                { href: '/documentos', label: 'Emitidos' },
+                { href: '/documentos/pedidos', label: 'Pedidos' },
+            ]}
+        />
+    );
+}
+
 /** Páginas da Configuração */
 export function NavConfiguracao() {
     return (

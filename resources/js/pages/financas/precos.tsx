@@ -96,18 +96,31 @@ function NovoPreco({ ano, cursos, tipos, fechar }: { ano: { id: number }; cursos
                         <InputError message={errors.prestacoes} className="mt-1" />
                     </LinhaForm>
                 )}
-                <LinhaForm rotulo="Dia de pagamento" htmlFor="dia_vencimento" obrigatorio ajuda="Depois deste dia do mês, a cobrança fica vencida.">
-                    <Input
-                        id="dia_vencimento"
-                        type="number"
-                        min={1}
-                        max={28}
-                        value={data.dia_vencimento}
-                        onChange={(e) => setData('dia_vencimento', e.target.value)}
-                        className="w-24"
-                    />
-                    <InputError message={errors.dia_vencimento} className="mt-1" />
-                </LinhaForm>
+                {data.tipo.startsWith('doc_') ? (
+                    <LinhaForm rotulo="Pagamento">
+                        <p className="text-muted-foreground pt-1.5 text-[13px]">
+                            Cobrado quando o estudante pede o documento; a secretaria emite-o depois de pago.
+                        </p>
+                    </LinhaForm>
+                ) : (
+                    <LinhaForm
+                        rotulo="Dia de pagamento"
+                        htmlFor="dia_vencimento"
+                        obrigatorio
+                        ajuda="Depois deste dia do mês, a cobrança fica vencida."
+                    >
+                        <Input
+                            id="dia_vencimento"
+                            type="number"
+                            min={1}
+                            max={28}
+                            value={data.dia_vencimento}
+                            onChange={(e) => setData('dia_vencimento', e.target.value)}
+                            className="w-24"
+                        />
+                        <InputError message={errors.dia_vencimento} className="mt-1" />
+                    </LinhaForm>
+                )}
                 <div className="flex justify-end gap-2 px-5 py-3">
                     <Button type="button" variant="outline" onClick={fechar}>
                         Cancelar
@@ -171,7 +184,7 @@ export default function Precos({ precos, ano, anos, cursos, tipos }: Props) {
                                 <td>{p.tipo_rotulo}</td>
                                 <td className="text-right tabular-nums">{formatMT(p.valor)}</td>
                                 <td className="text-right tabular-nums">{p.tipo === 'propina' ? p.prestacoes : '—'}</td>
-                                <td className="text-right tabular-nums">{p.dia_vencimento}</td>
+                                <td className="text-right tabular-nums">{p.tipo.startsWith('doc_') ? '—' : p.dia_vencimento}</td>
                                 {pode('financas.configurar') && (
                                     <td>
                                         <BotaoIcone
