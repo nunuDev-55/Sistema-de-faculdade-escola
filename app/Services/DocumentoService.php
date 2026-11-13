@@ -181,7 +181,7 @@ class DocumentoService
             ->whereHas('inscricaoPeriodo', fn ($q) => $q->where('matricula_id', $matricula->id)->where('estado', InscricaoPeriodo::CONFIRMADA))
             ->where('estado', '!=', Inscricao::ANULADO)
             ->get()
-            ->sortBy(fn (Inscricao $i) => [$i->inscricaoPeriodo->periodo?->numero ?? 0, $i->disciplina->nome])
+            ->sortBy(fn (Inscricao $i) => [$i->inscricaoPeriodo->periodo->numero ?? 0, $i->disciplina->nome])
             ->values();
         if ($disciplinas->isEmpty()) {
             throw ValidationException::withMessages(['tipo' => "{$estudante->nome} ainda não está inscrito em nenhuma disciplina neste ano: emita antes a declaração de matrícula."]);
@@ -276,7 +276,7 @@ class DocumentoService
             ->sortByDesc('id')->unique('disciplina_id')
             ->sortBy(fn (Inscricao $i) => [
                 $i->inscricaoPeriodo->matricula->anoLectivo->inicio->timestamp,
-                $i->inscricaoPeriodo->periodo?->numero ?? 0,
+                $i->inscricaoPeriodo->periodo->numero ?? 0,
                 $i->disciplina->nome,
             ])
             ->values();
