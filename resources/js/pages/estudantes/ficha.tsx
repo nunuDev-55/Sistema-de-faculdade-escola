@@ -91,6 +91,7 @@ interface Props {
     superior: boolean;
     financas: ContaCorrente | null;
     metodos: Opcao[];
+    portal: { conta: { estado: string; ultimo_acesso: string | null } | null; senha: string | null };
 }
 
 type Separador = 'percurso' | 'dados' | 'encarregados' | 'financas';
@@ -111,6 +112,60 @@ interface ContaCorrente {
     divida: string;
     vencido: string;
     credito: string;
+}
+
+/* ---------------------------------------------------------------- Portal */
+
+function AcessoPortal({ estudanteId, numero, portal }: { estudanteId: number; numero: string; portal: Props['portal'] }) {
+    const pode = usePode();
+    const criar = () => {
+        if (portal.conta && !confirm('Gerar uma senha nova? A antiga deixa de funcionar.')) return;
+        router.post(route('estudantes.portal.store', estudanteId), {}, { preserveScroll: true });
+    };
+    return (
+        <Bloco
+            titulo="Acesso ao portal do estudante"
+            accoes={
+                pode('estudantes.gerir') && (
+                    <div className="flex gap-2">
+                        {portal.conta && (
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => router.post(route('estudantes.portal.estado', estudanteId), {}, { preserveScroll: true })}
+                            >
+                                {portal.conta.estado === 'activa' ? 'Suspender' : 'Reactivar'}
+                            </Button>
+                        )}
+                        <Button size="sm" variant="outline" onClick={criar}>
+                            {portal.conta ? 'Gerar senha nova' : 'Dar acesso ao portal'}
+                        </Button>
+                    </div>
+                )
+            }
+        >
+            <div className="flex flex-col gap-2 px-5 py-3 text-[13.5px]">
+                {portal.senha && (
+                    <div className="rounded-md border border-green-300 bg-green-50 px-4 py-3 text-green-900 dark:border-green-800 dark:bg-green-950/40 dark:text-green-200">
+                        Entregue ao estudante: número <span className="font-mono font-semibold">{numero}</span>, senha{' '}
+                        <span className="font-mono text-[15px] font-semibold tracking-wider select-all">{portal.senha}</span>. Esta senha não volta a
+                        aparecer.
+                    </div>
+                )}
+                {portal.conta === null ? (
+                    <span className="text-muted-foreground">Ainda não tem acesso ao portal.</span>
+                ) : (
+                    <span>
+                        {portal.conta.estado === 'activa' ? <Estado cor="verde">Activo</Estado> : <Estado cor="cinza">Suspenso</Estado>}
+                        <span className="text-muted-foreground">
+                            {' '}
+                            · {portal.conta.ultimo_acesso ? `última entrada a ${formatData(portal.conta.ultimo_acesso)}` : 'ainda não entrou'}
+                        </span>
+                    </span>
+                )}
+            </div>
+        </Bloco>
+    );
 }
 
 /* ---------------------------------------------------------------- Finanças */
@@ -619,9 +674,19 @@ function NovoEncarregado({ estudanteId, parentescos, fechar }: { estudanteId: nu
 
 /* ---------------------------------------------------------------- Ficha */
 
-export default function FichaEstudante({ estudante, encarregados, matriculas, opcoesMatricula, parentescos, superior, financas, metodos }: Props) {
+export default function FichaEstudante({
+    estudante,
+    encarregados,
+    matriculas,
+    opcoesMatricula,
+    parentescos,
+    superior,
+    financas,
+    metodos,
+    portal,
+}: Props) {
     const pode = usePode();
-    const [separador, setSeparador] = useState<Separador>('percurso');
+    const [separador, setSeparador] = useState<Separador>(portal.senha ? 'dados' : 'percurso');
     const [novaMatricula, setNovaMatricula] = useState(false);
     const [novoEncarregado, setNovoEncarregado] = useState(false);
     const actual = matriculas.find((m) => m.estado !== 'anulada');
@@ -702,6 +767,7 @@ export default function FichaEstudante({ estudante, encarregados, matriculas, op
                         <Campo rotulo="Necessidades especiais">{estudante.necessidades_especiais}</Campo>
                         <Campo rotulo="Registado em">{formatData(estudante.registado_em)}</Campo>
                     </Campos>
+                    <AcessoPortal estudanteId={estudante.id} numero={estudante.numero} portal={portal} />
                     {estudante.nota_privada && (
                         <Bloco titulo="Nota interna">
                             <p className="px-5 py-3 text-[13.5px] whitespace-pre-line">{estudante.nota_privada}</p>

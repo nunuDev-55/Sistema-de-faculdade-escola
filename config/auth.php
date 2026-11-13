@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ContaPortal;
 use App\Models\User;
 
 return [
@@ -43,8 +44,12 @@ return [
             'provider' => 'users',
         ],
 
-        // As guardas dos portais (estudante, encarregado, candidato) acrescentam-se na fase dos portais,
-        // com os seus modelos e tabelas próprios, e nunca abrem o sistema interno (ver docs/05-arquitectura.md).
+        // Portal do estudante: modelo e tabela próprios, nunca abre o sistema interno (ver docs/05-arquitectura.md).
+        // As guardas do encarregado e do candidato acrescentam-se com os seus portais.
+        'estudante' => [
+            'driver' => 'session',
+            'provider' => 'contas_portal',
+        ],
     ],
 
     /*
@@ -68,6 +73,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
+        ],
+
+        'contas_portal' => [
+            'driver' => 'eloquent',
+            'model' => ContaPortal::class,
         ],
     ],
 

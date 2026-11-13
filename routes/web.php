@@ -15,6 +15,7 @@ use App\Http\Controllers\Estrutura\DisciplinaController;
 use App\Http\Controllers\Estrutura\PlanoController;
 use App\Http\Controllers\Estrutura\SalaController;
 use App\Http\Controllers\Estrutura\UnidadeController;
+use App\Http\Controllers\Estudantes\AcessoPortalController;
 use App\Http\Controllers\Estudantes\EncarregadoController;
 use App\Http\Controllers\Estudantes\EstudanteController;
 use App\Http\Controllers\Estudantes\InscricaoController;
@@ -23,6 +24,8 @@ use App\Http\Controllers\Financas\FinancasController;
 use App\Http\Controllers\Financas\PagamentoController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\ModuloController;
+use App\Http\Controllers\Portal\EntradaController;
+use App\Http\Controllers\Portal\PainelController;
 use App\Models\User;
 use App\Support\Modulos;
 use Illuminate\Http\Request;
@@ -84,6 +87,8 @@ Route::middleware(['auth:web'])->group(function () {
             Route::put('estudantes/{estudante}', [EstudanteController::class, 'update'])->name('estudantes.update');
             Route::post('estudantes/{estudante}/encarregados', [EncarregadoController::class, 'store'])->name('estudantes.encarregados.store');
             Route::delete('estudantes/{estudante}/encarregados/{encarregado}', [EncarregadoController::class, 'destroy'])->name('estudantes.encarregados.destroy');
+            Route::post('estudantes/{estudante}/portal', [AcessoPortalController::class, 'store'])->name('estudantes.portal.store');
+            Route::post('estudantes/{estudante}/portal/estado', [AcessoPortalController::class, 'alternar'])->name('estudantes.portal.estado');
         });
         Route::get('estudantes/{estudante}', [EstudanteController::class, 'show'])->whereNumber('estudante')->name('estudantes.show');
         Route::get('comprovativos/{inscricaoPeriodo}', [InscricaoController::class, 'comprovativo'])->name('inscricoes.comprovativo');
@@ -200,6 +205,18 @@ Route::middleware(['auth:web'])->group(function () {
             ->defaults('slug', $slug)
             ->name('modulos.'.$slug);
     }
+});
+
+// Portal do estudante: entrada própria (número de estudante e senha) e guarda própria; nunca abre o sistema interno
+Route::prefix('portal')->name('portal.')->group(function () {
+    Route::middleware('guest:estudante')->group(function () {
+        Route::get('entrar', [EntradaController::class, 'create'])->name('entrar');
+        Route::post('entrar', [EntradaController::class, 'store'])->middleware('throttle:20,1')->name('entrar.store');
+    });
+    Route::middleware('auth:estudante')->group(function () {
+        Route::get('/', PainelController::class)->name('painel');
+        Route::post('sair', [EntradaController::class, 'destroy'])->name('sair');
+    });
 });
 
 // Logótipo da instituição: público, porque vai nos documentos e na página de entrada.

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Estudantes\EstudanteRequest;
 use App\Models\AnoLectivo;
 use App\Models\Cobranca;
+use App\Models\ContaPortal;
 use App\Models\Curso;
 use App\Models\Encarregado;
 use App\Models\Estudante;
@@ -122,6 +123,14 @@ class EstudanteController extends Controller
             'superior' => TipoInstituicao::eSuperior(),
             'financas' => $user->can('financas.ver') ? $this->contaCorrente($estudante, $pagamentos) : null,
             'metodos' => Opcoes::de(Pagamento::METODOS),
+            'portal' => [
+                'conta' => ($conta = ContaPortal::where('estudante_id', $estudante->id)->first()) === null ? null : [
+                    'estado' => $conta->estado,
+                    'ultimo_acesso' => $conta->last_login_at?->toIso8601String(),
+                ],
+                // A senha nova aparece uma só vez, logo depois de ser criada
+                'senha' => $request->session()->get('senha_portal'),
+            ],
         ]);
     }
 

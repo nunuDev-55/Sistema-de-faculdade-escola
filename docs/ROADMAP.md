@@ -65,7 +65,7 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 
 | # | Módulo | O que inclui |
 |---|---|---|
-| 6.1 | Portal do estudante e do encarregado | Horário, notas, presenças, finanças |
+| 6.1 | Portal do estudante e do encarregado | **Feito em parte**: portal do estudante com entrada própria (número de estudante e senha entregue pela secretaria, guarda separada da equipa): matrículas, disciplinas e notas só de pautas publicadas ("Por lançar" antes, RN-16), propinas por pagar e pagamentos. Falta o encarregado, o horário, as presenças e a inscrição online |
 | 6.2 | Pedidos e emissão de documentos | Declarações, certificados, histórico, QR de verificação |
 | 6.3 | Candidaturas online | Fases, vagas, resultados, admissão |
 | 6.4 | Avisos e SMS | Por curso, turma, perfil, candidatos admitidos |
