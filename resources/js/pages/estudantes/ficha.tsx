@@ -89,9 +89,415 @@ interface Props {
     opcoesMatricula: OpcoesMatricula;
     parentescos: Opcao[];
     superior: boolean;
+    financas: ContaCorrente | null;
+    metodos: Opcao[];
+    portal: { conta: { estado: string; ultimo_acesso: string | null } | null; senha: string | null };
+    documentos: DocumentoFicha[] | null;
+    tiposDocumento: Opcao[];
 }
 
-type Separador = 'percurso' | 'dados' | 'encarregados';
+interface DocumentoFicha {
+    id: number;
+    numero: string;
+    tipo: string;
+    finalidade: string | null;
+    emitido_em: string;
+    emitido_por: string | null;
+    estado: string;
+}
+
+type Separador = 'percurso' | 'dados' | 'encarregados' | 'financas' | 'documentos';
+
+interface ContaCorrente {
+    cobrancas: {
+        id: number;
+        numero: string;
+        descricao: string;
+        valor: string;
+        pago: string;
+        vencimento: string;
+        estado: string;
+        estado_rotulo: string;
+        vencida: boolean;
+    }[];
+    pagamentos: { id: number; numero: string; data: string; valor: string; metodo: string; estado: string }[];
+    divida: string;
+    vencido: string;
+    credito: string;
+}
+
+/* ---------------------------------------------------------------- Portal */
+
+function AcessoPortal({ estudanteId, numero, portal }: { estudanteId: number; numero: string; portal: Props['portal'] }) {
+    const pode = usePode();
+    const criar = () => {
+        if (portal.conta && !confirm('Gerar uma senha nova? A antiga deixa de funcionar.')) return;
+        router.post(route('estudantes.portal.store', estudanteId), {}, { preserveScroll: true });
+    };
+    return (
+        <Bloco
+            titulo="Acesso ao portal do estudante"
+            accoes={
+                pode('estudantes.gerir') && (
+                    <div className="flex gap-2">
+                        {portal.conta && (
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => router.post(route('estudantes.portal.estado', estudanteId), {}, { preserveScroll: true })}
+                            >
+                                {portal.conta.estado === 'activa' ? 'Suspender' : 'Reactivar'}
+                            </Button>
+                        )}
+                        <Button size="sm" variant="outline" onClick={criar}>
+                            {portal.conta ? 'Gerar senha nova' : 'Dar acesso ao portal'}
+                        </Button>
+                    </div>
+                )
+            }
+        >
+            <div className="flex flex-col gap-2 px-5 py-3 text-[13.5px]">
+                {portal.senha && (
+                    <div className="rounded-md border border-green-300 bg-green-50 px-4 py-3 text-green-900 dark:border-green-800 dark:bg-green-950/40 dark:text-green-200">
+                        Entregue ao estudante: número <span className="font-mono font-semibold">{numero}</span>, senha{' '}
+                        <span className="font-mono text-[15px] font-semibold tracking-wider select-all">{portal.senha}</span>. Esta senha não volta a
+                        aparecer.
+                    </div>
+                )}
+                {portal.conta === null ? (
+                    <span className="text-muted-foreground">Ainda não tem acesso ao portal.</span>
+                ) : (
+                    <span>
+                        {portal.conta.estado === 'activa' ? <Estado cor="verde">Activo</Estado> : <Estado cor="cinza">Suspenso</Estado>}
+                        <span className="text-muted-foreground">
+                            {' '}
+                            · {portal.conta.ultimo_acesso ? `última entrada a ${formatData(portal.conta.ultimo_acesso)}` : 'ainda não entrou'}
+                        </span>
+                    </span>
+                )}
+            </div>
+        </Bloco>
+    );
+}
+
+/* ---------------------------------------------------------------- Finanças */
+
+function NovoPagamento({ estudanteId, metodos, fechar }: { estudanteId: number; metodos: Opcao[]; fechar: () => void }) {
+    const { data, setData, post, processing, errors } = useForm({
+        valor: '',
+        data: new Date().toISOString().slice(0, 10),
+        metodo: 'numerario',
+        referencia: '',
+    });
+    const guardar = (e: FormEvent) => {
+        e.preventDefault();
+        post(route('pagamentos.store', estudanteId), { onSuccess: fechar });
+    };
+    return (
+        <form onSubmit={guardar} className="border-b">
+            <LinhaForm
+                rotulo="Valor (MT)"
+                htmlFor="pg_valor"
+                obrigatorio
+                ajuda="Abate as cobranças que vencem primeiro; o que sobrar fica como adiantamento."
+            >
+                <Input
+                    id="pg_valor"
+                    inputMode="decimal"
+                    value={data.valor}
+                    onChange={(e) => setData('valor', e.target.value)}
+                    className="max-w-40 tabular-nums"
+                />
+                <InputError message={errors.valor} className="mt-1" />
+            </LinhaForm>
+            <LinhaForm rotulo="Data" htmlFor="pg_data" obrigatorio>
+                <Input id="pg_data" type="date" value={data.data} onChange={(e) => setData('data', e.target.value)} className="max-w-48" />
+                <InputError message={errors.data} className="mt-1" />
+            </LinhaForm>
+            <LinhaForm rotulo="Forma de pagamento" htmlFor="pg_metodo" obrigatorio>
+                <CaixaEscolha id="pg_metodo" value={data.metodo} onChange={(e) => setData('metodo', e.target.value)} className="max-w-60">
+                    {metodos.map((m) => (
+                        <option key={m.valor} value={m.valor}>
+                            {m.rotulo}
+                        </option>
+                    ))}
+                </CaixaEscolha>
+            </LinhaForm>
+            <LinhaForm rotulo="Referência" htmlFor="pg_referencia" ajuda="Número do talão do banco ou da transacção M-Pesa / e-Mola.">
+                <Input id="pg_referencia" value={data.referencia} onChange={(e) => setData('referencia', e.target.value)} className="max-w-64" />
+            </LinhaForm>
+            <div className="flex justify-end gap-2 px-5 py-3">
+                <Button type="button" variant="outline" onClick={fechar}>
+                    Cancelar
+                </Button>
+                <Button type="submit" disabled={processing}>
+                    Registar e emitir recibo
+                </Button>
+            </div>
+        </form>
+    );
+}
+
+function Financas({ estudanteId, conta, metodos }: { estudanteId: number; conta: ContaCorrente; metodos: Opcao[] }) {
+    const pode = usePode();
+    const [novo, setNovo] = useState(false);
+    const mt = (v: string) => `${Number(v).toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MT`;
+    return (
+        <div className="flex flex-col gap-5">
+            <div className="grid gap-3 sm:grid-cols-3">
+                {[
+                    ['Em dívida', conta.divida, ''],
+                    ['Vencido', conta.vencido, 'text-red-700 dark:text-red-400'],
+                    ['Adiantamento', conta.credito, 'text-green-700 dark:text-green-400'],
+                ].map(([rotulo, valor, cor]) => (
+                    <div key={rotulo} className="painel px-4 py-3">
+                        <div className="text-muted-foreground text-[12.5px]">{rotulo}</div>
+                        <div className={`text-[19px] font-semibold tabular-nums ${cor}`}>{mt(valor)}</div>
+                    </div>
+                ))}
+            </div>
+            <Bloco
+                titulo="Pagamentos"
+                accoes={
+                    pode('pagamentos.registar') &&
+                    !novo && (
+                        <Button size="sm" onClick={() => setNovo(true)}>
+                            <Plus /> Registar pagamento
+                        </Button>
+                    )
+                }
+            >
+                {novo && <NovoPagamento estudanteId={estudanteId} metodos={metodos} fechar={() => setNovo(false)} />}
+                <table className="tabela">
+                    <thead>
+                        <tr>
+                            <th>Recibo</th>
+                            <th>Data</th>
+                            <th>Forma</th>
+                            <th className="text-right">Valor</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {conta.pagamentos.length === 0 && <LinhaVazia colunas={5} texto="Ainda não há pagamentos." />}
+                        {conta.pagamentos.map((p) => (
+                            <tr key={p.id}>
+                                <td>
+                                    <Link href={route('pagamentos.recibo', p.id)} className="font-mono text-[12.5px] hover:underline">
+                                        {p.numero}
+                                    </Link>
+                                </td>
+                                <td className="tabular-nums">{formatData(p.data)}</td>
+                                <td>{p.metodo}</td>
+                                <td className="text-right tabular-nums">{mt(p.valor)}</td>
+                                <td>{p.estado === 'valido' ? <Estado cor="verde">Válido</Estado> : <Estado cor="cinza">Anulado</Estado>}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </Bloco>
+            <Bloco titulo="Cobranças">
+                <table className="tabela">
+                    <thead>
+                        <tr>
+                            <th>Cobrança</th>
+                            <th>Descrição</th>
+                            <th>Vencimento</th>
+                            <th className="text-right">Valor</th>
+                            <th className="text-right">Pago</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {conta.cobrancas.length === 0 && <LinhaVazia colunas={6} texto="Ainda não há cobranças." />}
+                        {conta.cobrancas.map((c) => (
+                            <tr key={c.id}>
+                                <td className="font-mono text-[12.5px]">{c.numero}</td>
+                                <td>{c.descricao}</td>
+                                <td className="tabular-nums">{formatData(c.vencimento)}</td>
+                                <td className="text-right tabular-nums">{mt(c.valor)}</td>
+                                <td className="text-right tabular-nums">{mt(c.pago)}</td>
+                                <td>
+                                    {c.vencida ? (
+                                        <Estado cor="vermelho">Vencida</Estado>
+                                    ) : (
+                                        <Estado
+                                            cor={
+                                                c.estado === 'paga'
+                                                    ? 'verde'
+                                                    : c.estado === 'parcial'
+                                                      ? 'azul'
+                                                      : c.estado === 'anulada'
+                                                        ? 'cinza'
+                                                        : 'laranja'
+                                            }
+                                        >
+                                            {c.estado_rotulo}
+                                        </Estado>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </Bloco>
+        </div>
+    );
+}
+
+/* ---------------------------------------------------------------- Documentos */
+
+const DE_MATRICULA = ['declaracao_matricula', 'declaracao_frequencia'];
+
+function EmitirDocumento({
+    estudanteId,
+    tipos,
+    matriculas,
+    fechar,
+}: {
+    estudanteId: number;
+    tipos: Opcao[];
+    matriculas: Matricula[];
+    fechar: () => void;
+}) {
+    const activas = matriculas.filter((m) => m.estado === 'activa');
+    const { data, setData, post, processing, errors } = useForm({
+        tipo: 'declaracao_matricula',
+        matricula_id: String(activas[0]?.id ?? matriculas[0]?.id ?? ''),
+        finalidade: '',
+    });
+    const emitir = (e: FormEvent) => {
+        e.preventDefault();
+        post(route('documentos.store', estudanteId));
+    };
+    return (
+        <form onSubmit={emitir} className="border-b">
+            <LinhaForm rotulo="Documento" htmlFor="dc_tipo" obrigatorio>
+                <CaixaEscolha id="dc_tipo" value={data.tipo} onChange={(e) => setData('tipo', e.target.value)} className="max-w-72">
+                    {tipos.map((t) => (
+                        <option key={t.valor} value={t.valor}>
+                            {t.rotulo}
+                        </option>
+                    ))}
+                </CaixaEscolha>
+                <InputError message={errors.tipo} className="mt-1" />
+            </LinhaForm>
+            {DE_MATRICULA.includes(data.tipo) ? (
+                <LinhaForm rotulo="Matrícula" htmlFor="dc_matricula" obrigatorio ajuda="A declaração diz respeito a este ano lectivo.">
+                    <CaixaEscolha
+                        id="dc_matricula"
+                        value={data.matricula_id}
+                        onChange={(e) => setData('matricula_id', e.target.value)}
+                        className="max-w-96"
+                    >
+                        {matriculas.map((m) => (
+                            <option key={m.id} value={m.id}>
+                                {m.ano_lectivo} · {m.curso} · {m.estado_rotulo}
+                            </option>
+                        ))}
+                    </CaixaEscolha>
+                    <InputError message={errors.matricula_id} className="mt-1" />
+                </LinhaForm>
+            ) : (
+                <LinhaForm rotulo="Curso" htmlFor="dc_matricula" ajuda="Só entram as notas de pautas publicadas.">
+                    <CaixaEscolha
+                        id="dc_matricula"
+                        value={data.matricula_id}
+                        onChange={(e) => setData('matricula_id', e.target.value)}
+                        className="max-w-96"
+                    >
+                        {matriculas
+                            .filter((m, i) => matriculas.findIndex((o) => o.curso_id === m.curso_id) === i)
+                            .map((m) => (
+                                <option key={m.id} value={m.id}>
+                                    {m.curso}
+                                </option>
+                            ))}
+                    </CaixaEscolha>
+                    <InputError message={errors.matricula_id} className="mt-1" />
+                </LinhaForm>
+            )}
+            <LinhaForm
+                rotulo="Finalidade"
+                htmlFor="dc_finalidade"
+                ajuda="Opcional. Ex.: efeitos de bolsa de estudo; apresentação na entidade empregadora."
+            >
+                <Input id="dc_finalidade" value={data.finalidade} onChange={(e) => setData('finalidade', e.target.value)} className="max-w-96" />
+                <InputError message={errors.finalidade} className="mt-1" />
+            </LinhaForm>
+            <div className="flex justify-end gap-2 px-5 py-3">
+                <Button type="button" variant="outline" onClick={fechar}>
+                    Cancelar
+                </Button>
+                <Button type="submit" disabled={processing || data.matricula_id === ''}>
+                    Emitir
+                </Button>
+            </div>
+        </form>
+    );
+}
+
+function Documentos({
+    estudanteId,
+    documentos,
+    tipos,
+    matriculas,
+}: {
+    estudanteId: number;
+    documentos: DocumentoFicha[];
+    tipos: Opcao[];
+    matriculas: Matricula[];
+}) {
+    const pode = usePode();
+    const [novo, setNovo] = useState(false);
+    return (
+        <Bloco
+            titulo="Documentos emitidos"
+            accoes={
+                pode('documentos.emitir') &&
+                !novo &&
+                matriculas.length > 0 && (
+                    <Button size="sm" onClick={() => setNovo(true)}>
+                        <Plus /> Emitir documento
+                    </Button>
+                )
+            }
+        >
+            {novo && <EmitirDocumento estudanteId={estudanteId} tipos={tipos} matriculas={matriculas} fechar={() => setNovo(false)} />}
+            <table className="tabela">
+                <thead>
+                    <tr>
+                        <th>Documento</th>
+                        <th>Tipo</th>
+                        <th>Emitido</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {documentos.length === 0 && <LinhaVazia colunas={4} texto="Ainda não foram emitidos documentos." />}
+                    {documentos.map((d) => (
+                        <tr key={d.id}>
+                            <td>
+                                <Link href={route('documentos.show', d.id)} className="font-mono text-[12.5px] hover:underline">
+                                    {d.numero}
+                                </Link>
+                            </td>
+                            <td>
+                                {d.tipo}
+                                {d.finalidade && <div className="text-muted-foreground text-[12px]">{d.finalidade}</div>}
+                            </td>
+                            <td className="tabular-nums">
+                                {formatData(d.emitido_em)}
+                                {d.emitido_por && <span className="text-muted-foreground"> · {d.emitido_por}</span>}
+                            </td>
+                            <td>{d.estado === 'valido' ? <Estado cor="verde">Válido</Estado> : <Estado cor="cinza">Anulado</Estado>}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </Bloco>
+    );
+}
 
 /* ---------------------------------------------------------------- Nova matrícula */
 
@@ -434,9 +840,21 @@ function NovoEncarregado({ estudanteId, parentescos, fechar }: { estudanteId: nu
 
 /* ---------------------------------------------------------------- Ficha */
 
-export default function FichaEstudante({ estudante, encarregados, matriculas, opcoesMatricula, parentescos, superior }: Props) {
+export default function FichaEstudante({
+    estudante,
+    encarregados,
+    matriculas,
+    opcoesMatricula,
+    parentescos,
+    superior,
+    financas,
+    metodos,
+    portal,
+    documentos,
+    tiposDocumento,
+}: Props) {
     const pode = usePode();
-    const [separador, setSeparador] = useState<Separador>('percurso');
+    const [separador, setSeparador] = useState<Separador>(portal.senha ? 'dados' : 'percurso');
     const [novaMatricula, setNovaMatricula] = useState(false);
     const [novoEncarregado, setNovoEncarregado] = useState(false);
     const actual = matriculas.find((m) => m.estado !== 'anulada');
@@ -481,6 +899,8 @@ export default function FichaEstudante({ estudante, encarregados, matriculas, op
                     { valor: 'percurso', label: 'Matrículas e inscrições' },
                     { valor: 'dados', label: 'Dados pessoais' },
                     { valor: 'encarregados', label: `Encarregados (${encarregados.length})` },
+                    ...(financas ? [{ valor: 'financas' as const, label: 'Finanças' }] : []),
+                    ...(documentos ? [{ valor: 'documentos' as const, label: `Documentos (${documentos.length})` }] : []),
                 ]}
                 activo={separador}
                 mudar={setSeparador}
@@ -516,6 +936,7 @@ export default function FichaEstudante({ estudante, encarregados, matriculas, op
                         <Campo rotulo="Necessidades especiais">{estudante.necessidades_especiais}</Campo>
                         <Campo rotulo="Registado em">{formatData(estudante.registado_em)}</Campo>
                     </Campos>
+                    <AcessoPortal estudanteId={estudante.id} numero={estudante.numero} portal={portal} />
                     {estudante.nota_privada && (
                         <Bloco titulo="Nota interna">
                             <p className="px-5 py-3 text-[13.5px] whitespace-pre-line">{estudante.nota_privada}</p>
@@ -575,6 +996,16 @@ export default function FichaEstudante({ estudante, encarregados, matriculas, op
                         </tbody>
                     </table>
                 </Bloco>
+            )}
+
+            {separador === 'financas' && financas && <Financas estudanteId={estudante.id} conta={financas} metodos={metodos} />}
+            {separador === 'documentos' && documentos && (
+                <Documentos
+                    estudanteId={estudante.id}
+                    documentos={documentos}
+                    tipos={tiposDocumento}
+                    matriculas={matriculas.filter((m) => m.estado !== 'anulada')}
+                />
             )}
         </AppLayout>
     );

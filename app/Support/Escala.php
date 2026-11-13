@@ -80,6 +80,14 @@ final class Escala
         return 'admitido';
     }
 
+    /** Nota final de quem foi a exame: a média de frequência e a do exame, com o peso do exame da Configuração (RN-03). */
+    public static function notaFinal(string $mediaFrequencia, string $exame): string
+    {
+        $peso = max(0.0, min(100.0, (float) self::parametro('peso_exame'))) / 100;
+
+        return self::arredondar((string) ((float) $mediaFrequencia * (1 - $peso) + (float) $exame * $peso));
+    }
+
     public static function aprovado(string $nota): bool
     {
         return (float) $nota >= (float) self::parametro('nota_minima_aprovacao');

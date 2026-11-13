@@ -12,7 +12,7 @@ namespace App\Support;
  */
 final class Modulos
 {
-    /** @var array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool}> */
+    /** @var array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool, permissoes?: list<string>}> */
     public const LISTA = [
         'candidaturas' => [
             'href' => '/candidaturas',
@@ -41,6 +41,8 @@ final class Modulos
             'href' => '/docencia',
             'titulo' => 'Docentes, horários e aulas',
             'permissao' => 'aulas.registar',
+            'permissoes' => ['turmas.ver', 'aulas.registar'],
+            'feito' => true,
             'descricao' => 'Distribuição de serviço, horários sem sobreposições, sumários, presenças e materiais.',
             'planeado' => ['Distribuição de serviço docente', 'Horário por turma, docente e sala', 'Sumários e presenças por aula', 'Materiais das aulas'],
         ],
@@ -48,6 +50,7 @@ final class Modulos
             'href' => '/pautas',
             'titulo' => 'Avaliação e pautas',
             'permissao' => 'pautas.ver',
+            'feito' => true,
             'descricao' => 'Plano de avaliação, lançamento de notas, pautas e revisões.',
             'planeado' => ['Plano de avaliação (pesos = 100%)', 'Folha de notas tipo Excel', 'Pauta: rascunho → validada → publicada → fechada', 'Exame, recorrência e especial; revisões de nota'],
         ],
@@ -55,6 +58,7 @@ final class Modulos
             'href' => '/financas',
             'titulo' => 'Finanças do estudante',
             'permissao' => 'financas.ver',
+            'feito' => true,
             'descricao' => 'Tabela de preços, cobranças, pagamentos, recibos e referências bancárias.',
             'planeado' => ['Taxa de inscrição e propinas mensais', 'Cobranças do ano e conta corrente', 'Pagamentos, adiantamentos e recibos', 'Referência bancária por cobrança e devedores'],
         ],
@@ -62,6 +66,7 @@ final class Modulos
             'href' => '/documentos',
             'titulo' => 'Documentos académicos',
             'permissao' => 'documentos.ver',
+            'feito' => true,
             'descricao' => 'Declarações, certificados e histórico escolar, com número e QR de verificação.',
             'planeado' => ['Pedido de documento no portal', 'Emolumento e fila da secretaria', 'Emissão com QR de verificação', 'Verificação pública em /verificar/{codigo}'],
         ],
@@ -78,7 +83,7 @@ final class Modulos
     /**
      * Módulos de Administração (herdados do nsERP, portam-se na fase 1).
      *
-     * @var array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool}>
+     * @var array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool, permissoes?: list<string>}>
      */
     public const ADMINISTRACAO = [
         'utilizadores' => [
@@ -122,7 +127,7 @@ final class Modulos
         ],
     ];
 
-    /** @return array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool}> */
+    /** @return array<string, array{href: string, titulo: string, permissao: string, descricao: string, planeado: list<string>, feito?: bool, permissoes?: list<string>}> */
     public static function todos(): array
     {
         return [...self::LISTA, ...self::ADMINISTRACAO];

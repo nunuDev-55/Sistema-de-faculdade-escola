@@ -20,8 +20,8 @@ export interface ItemNav {
     label: string;
     href: string;
     icone: LucideIcon;
-    /** Permissão necessária; sem ela a entrada não aparece (o backend verifica sempre) */
-    permissao?: string;
+    /** Permissão necessária (ou uma de várias); sem ela a entrada não aparece (o backend verifica sempre) */
+    permissao?: string | string[];
 }
 
 export interface GrupoNav {
@@ -44,7 +44,7 @@ export const NAVEGACAO: GrupoNav[] = [
             { label: 'Estudantes', href: '/estudantes', icone: Users, permissao: 'estudantes.ver' },
             { label: 'Matrículas', href: '/matriculas', icone: ClipboardList, permissao: 'matriculas.criar' },
             { label: 'Avaliação', href: '/pautas', icone: GraduationCap, permissao: 'pautas.ver' },
-            { label: 'Docência', href: '/docencia', icone: CalendarDays, permissao: 'aulas.registar' },
+            { label: 'Docência', href: '/docencia', icone: CalendarDays, permissao: ['turmas.ver', 'aulas.registar'] },
             { label: 'Estrutura', href: '/estrutura', icone: Network, permissao: 'estrutura.ver' },
         ],
     },

@@ -5,15 +5,21 @@ namespace App\Http\Controllers\Estudantes;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Estudantes\EstudanteRequest;
 use App\Models\AnoLectivo;
+use App\Models\Cobranca;
+use App\Models\ContaPortal;
 use App\Models\Curso;
+use App\Models\DocumentoEmitido;
 use App\Models\Encarregado;
 use App\Models\Estudante;
 use App\Models\Inscricao;
 use App\Models\InscricaoPeriodo;
 use App\Models\Matricula;
+use App\Models\Pagamento;
 use App\Models\PeriodoLectivo;
 use App\Models\User;
 use App\Services\EstudanteService;
+use App\Services\PagamentoService;
+use App\Support\Dinheiro;
 use App\Support\Opcoes;
 use App\Support\Pesquisa;
 use App\Support\TipoInstituicao;
@@ -86,8 +92,10 @@ class EstudanteController extends Controller
         return to_route('estudantes.show', $estudante)->with('sucesso', "Estudante registado com o número {$estudante->numero}.");
     }
 
-    public function show(Estudante $estudante): Response
+    public function show(Request $request, Estudante $estudante, PagamentoService $pagamentos): Response
     {
+        /** @var User $user */
+        $user = $request->user();
         $estudante->load([
             'encarregados' => fn ($q) => $q->orderByDesc('estudante_encarregado.principal')->orderBy('nome'),
             'matriculas' => fn ($q) => $q->with([
@@ -114,7 +122,64 @@ class EstudanteController extends Controller
             'opcoesMatricula' => $this->opcoesMatricula($matriculas->first()),
             'parentescos' => Opcoes::de(Encarregado::PARENTESCOS),
             'superior' => TipoInstituicao::eSuperior(),
+            'financas' => $user->can('financas.ver') ? $this->contaCorrente($estudante, $pagamentos) : null,
+            'metodos' => Opcoes::de(Pagamento::METODOS),
+            'documentos' => $user->can('documentos.ver') ? DocumentoEmitido::with('emitidoPor')->where('estudante_id', $estudante->id)
+                ->orderByDesc('emitido_em')->orderByDesc('id')->get()->map(fn (DocumentoEmitido $d) => [
+                    'id' => $d->id,
+                    'numero' => $d->numero,
+                    'tipo' => $d->nomeTipo(),
+                    'finalidade' => $d->finalidade,
+                    'emitido_em' => $d->emitido_em->toIso8601String(),
+                    'emitido_por' => $d->emitidoPor?->name,
+                    'estado' => $d->estado,
+                ])->values() : null,
+            'tiposDocumento' => Opcoes::de(DocumentoEmitido::TIPOS),
+            'portal' => [
+                'conta' => ($conta = ContaPortal::where('estudante_id', $estudante->id)->first()) === null ? null : [
+                    'estado' => $conta->estado,
+                    'ultimo_acesso' => $conta->last_login_at?->toIso8601String(),
+                ],
+                // A senha nova aparece uma só vez, logo depois de ser criada
+                'senha' => $request->session()->get('senha_portal'),
+            ],
         ]);
+    }
+
+    /**
+     * A conta corrente: cobranças, pagamentos e o saldo (em dívida, vencido e adiantamento).
+     *
+     * @return array<string, mixed>
+     */
+    private function contaCorrente(Estudante $estudante, PagamentoService $pagamentos): array
+    {
+        $cobrancas = Cobranca::where('estudante_id', $estudante->id)->orderBy('vencimento')->orderBy('id')->get();
+        $abertas = $cobrancas->whereIn('estado', ['aberta', 'parcial']);
+
+        return [
+            'cobrancas' => $cobrancas->map(fn (Cobranca $c) => [
+                'id' => $c->id,
+                'numero' => $c->numero,
+                'descricao' => $c->descricao,
+                'valor' => $c->valor,
+                'pago' => $c->pago,
+                'vencimento' => $c->vencimento->toDateString(),
+                'estado' => $c->estado,
+                'estado_rotulo' => Cobranca::ESTADOS[$c->estado] ?? $c->estado,
+                'vencida' => $c->vencida(),
+            ])->values(),
+            'pagamentos' => Pagamento::where('estudante_id', $estudante->id)->orderByDesc('data')->orderByDesc('id')->get()->map(fn (Pagamento $p) => [
+                'id' => $p->id,
+                'numero' => $p->numero,
+                'data' => $p->data->toDateString(),
+                'valor' => $p->valor,
+                'metodo' => Pagamento::METODOS[$p->metodo] ?? $p->metodo,
+                'estado' => $p->estado,
+            ])->values(),
+            'divida' => Dinheiro::somar($abertas->map(fn (Cobranca $c) => $c->emDivida())),
+            'vencido' => Dinheiro::somar($abertas->filter(fn (Cobranca $c) => $c->vencida())->map(fn (Cobranca $c) => $c->emDivida())),
+            'credito' => $pagamentos->credito($estudante),
+        ];
     }
 
     public function edit(Estudante $estudante): Response

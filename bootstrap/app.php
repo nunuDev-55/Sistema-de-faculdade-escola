@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,7 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->redirectGuestsTo(fn () => route('login'));
+        // Quem ainda não entrou vai para a sua entrada: o portal do estudante tem a sua
+        $middleware->redirectGuestsTo(fn (Request $request) => $request->is('portal', 'portal/*') ? route('portal.entrar') : route('login'));
+        $middleware->redirectUsersTo(fn (Request $request) => $request->is('portal', 'portal/*') ? route('portal.painel') : route('dashboard'));
 
         // Um túnel (Cloudflare) ou o Nginx do servidor na própria máquina diz o IP e o esquema do visitante
         // (X-Forwarded-*). Só se acredita nesses cabeçalhos quando o pedido chega da própria máquina.

@@ -41,6 +41,22 @@ class AnoLectivo extends Model
         return $this->hasMany(PeriodoLectivo::class, 'ano_lectivo_id')->orderBy('numero');
     }
 
+    /** O ano lectivo que está a decorrer hoje; se nenhum, o aberto; se nenhum, o mais recente. */
+    public static function emCurso(): ?self
+    {
+        $hoje = now()->toDateString();
+
+        return self::with('periodos')->where('inicio', '<=', $hoje)->where('fim', '>=', $hoje)->orderByDesc('inicio')->first()
+            ?? self::with('periodos')->where('estado', 'aberto')->orderByDesc('inicio')->first()
+            ?? self::with('periodos')->orderByDesc('inicio')->first();
+    }
+
+    /** O semestre ou trimestre que está a decorrer hoje (ou nenhum, nas férias). */
+    public function periodoEmCurso(): ?PeriodoLectivo
+    {
+        return $this->periodos->first(fn (PeriodoLectivo $p) => now()->between($p->inicio->copy()->startOfDay(), $p->fim->copy()->endOfDay()));
+    }
+
     protected function nomeAuditoria(): string
     {
         return 'calendario';

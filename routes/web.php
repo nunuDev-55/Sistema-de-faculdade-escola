@@ -4,18 +4,35 @@ use App\Http\Controllers\Administracao\AuditoriaController;
 use App\Http\Controllers\Administracao\ConfiguracaoController;
 use App\Http\Controllers\Administracao\PerfilController;
 use App\Http\Controllers\Administracao\UtilizadorController;
+use App\Http\Controllers\Avaliacao\AvaliacaoController;
+use App\Http\Controllers\Avaliacao\PautaController;
+use App\Http\Controllers\Docencia\DocenteController;
+use App\Http\Controllers\Docencia\MinhasTurmasController;
+use App\Http\Controllers\Docencia\TurmaController;
+use App\Http\Controllers\Documentos\DocumentoController;
+use App\Http\Controllers\Documentos\PedidoController;
+use App\Http\Controllers\Documentos\VerificacaoController;
 use App\Http\Controllers\Estrutura\CalendarioController;
 use App\Http\Controllers\Estrutura\CursoController;
 use App\Http\Controllers\Estrutura\DisciplinaController;
 use App\Http\Controllers\Estrutura\PlanoController;
+use App\Http\Controllers\Estrutura\SalaController;
 use App\Http\Controllers\Estrutura\UnidadeController;
+use App\Http\Controllers\Estudantes\AcessoPortalController;
 use App\Http\Controllers\Estudantes\EncarregadoController;
 use App\Http\Controllers\Estudantes\EstudanteController;
 use App\Http\Controllers\Estudantes\InscricaoController;
 use App\Http\Controllers\Estudantes\MatriculaController;
+use App\Http\Controllers\Financas\FinancasController;
+use App\Http\Controllers\Financas\PagamentoController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\ModuloController;
+use App\Http\Controllers\Portal\EntradaController;
+use App\Http\Controllers\Portal\PainelController;
+use App\Http\Controllers\Portal\PedidoDocumentoController;
+use App\Models\User;
 use App\Support\Modulos;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // O sistema interno: só a equipa (guarda "web"). Os portais (estudante, encarregado, candidato) e o site
@@ -35,6 +52,7 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('unidades', [UnidadeController::class, 'index'])->name('unidades.index');
         Route::get('planos/{plano}', [PlanoController::class, 'show'])->name('planos.show');
         Route::get('calendario', [CalendarioController::class, 'index'])->name('calendario.index');
+        Route::get('salas', [SalaController::class, 'index'])->name('salas.index');
 
         Route::middleware('can:estrutura.gerir')->group(function () {
             Route::post('cursos', [CursoController::class, 'store'])->name('cursos.store');
@@ -58,6 +76,8 @@ Route::middleware(['auth:web'])->group(function () {
         Route::middleware('can:calendario.gerir')->group(function () {
             Route::post('calendario', [CalendarioController::class, 'store'])->name('calendario.store');
             Route::put('calendario/periodos/{periodo}', [CalendarioController::class, 'actualizarPeriodo'])->name('calendario.periodos.update');
+            Route::post('salas', [SalaController::class, 'store'])->name('salas.store');
+            Route::put('salas/{sala}', [SalaController::class, 'update'])->name('salas.update');
         });
     });
 
@@ -71,6 +91,8 @@ Route::middleware(['auth:web'])->group(function () {
             Route::put('estudantes/{estudante}', [EstudanteController::class, 'update'])->name('estudantes.update');
             Route::post('estudantes/{estudante}/encarregados', [EncarregadoController::class, 'store'])->name('estudantes.encarregados.store');
             Route::delete('estudantes/{estudante}/encarregados/{encarregado}', [EncarregadoController::class, 'destroy'])->name('estudantes.encarregados.destroy');
+            Route::post('estudantes/{estudante}/portal', [AcessoPortalController::class, 'store'])->name('estudantes.portal.store');
+            Route::post('estudantes/{estudante}/portal/estado', [AcessoPortalController::class, 'alternar'])->name('estudantes.portal.estado');
         });
         Route::get('estudantes/{estudante}', [EstudanteController::class, 'show'])->whereNumber('estudante')->name('estudantes.show');
         Route::get('comprovativos/{inscricaoPeriodo}', [InscricaoController::class, 'comprovativo'])->name('inscricoes.comprovativo');
@@ -84,6 +106,83 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('matriculas/{matricula}/inscricao/{periodo}', [InscricaoController::class, 'create'])->name('inscricoes.create');
         Route::post('matriculas/{matricula}/inscricao/{periodo}', [InscricaoController::class, 'store'])->name('inscricoes.store');
         Route::delete('inscricoes/{inscricao}', [InscricaoController::class, 'destroy'])->name('inscricoes.destroy');
+    });
+
+    // Docência: turmas, distribuição de serviço e docentes; o docente vê as suas turmas
+    Route::prefix('docencia')->group(function () {
+        Route::get('/', function (Request $request) {
+            /** @var User $user */
+            $user = $request->user();
+            abort_unless($user->can('turmas.ver') || $user->can('aulas.registar'), 403);
+
+            return $user->can('turmas.ver') ? to_route('turmas.index') : to_route('docencia.minhas');
+        })->name('docencia.index');
+        Route::get('minhas-turmas', MinhasTurmasController::class)->middleware('can:aulas.registar')->name('docencia.minhas');
+
+        Route::middleware('can:turmas.ver')->group(function () {
+            Route::get('turmas', [TurmaController::class, 'index'])->name('turmas.index');
+            Route::get('turmas/{turma}', [TurmaController::class, 'show'])->name('turmas.show');
+            Route::get('docentes', [DocenteController::class, 'index'])->name('docentes.index');
+        });
+        Route::middleware('can:turmas.gerir')->controller(TurmaController::class)->group(function () {
+            Route::post('turmas', 'store')->name('turmas.store');
+            Route::put('turmas/{turma}', 'update')->name('turmas.update');
+            Route::delete('turmas/{turma}', 'destroy')->name('turmas.destroy');
+            Route::post('turmas/{turma}/distribuir', 'distribuir')->name('turmas.distribuir');
+            Route::post('turmas/{turma}/estudantes', 'mudarEstudante')->name('turmas.estudantes.mudar');
+        });
+        Route::middleware('can:distribuicao.gerir')->controller(TurmaController::class)->group(function () {
+            Route::post('turmas/{turma}/disciplinas', 'acrescentarDisciplina')->name('turmas.disciplinas.store');
+            Route::put('leccionacoes/{leccionacao}', 'atribuirDocente')->name('leccionacoes.docente');
+        });
+        Route::middleware('can:docentes.gerir')->group(function () {
+            Route::post('docentes', [DocenteController::class, 'store'])->name('docentes.store');
+            Route::put('docentes/{docente}', [DocenteController::class, 'update'])->name('docentes.update');
+        });
+    });
+
+    // Avaliação: plano de avaliação, notas e pautas. Quem lança e quem vê decide-se na disciplina (PautaService)
+    Route::prefix('pautas')->group(function () {
+        Route::get('/', [PautaController::class, 'index'])->middleware('can:pautas.ver')->name('pautas.index');
+        Route::get('disciplina/{leccionacao}', [AvaliacaoController::class, 'show'])->name('avaliacao.show');
+        Route::put('disciplina/{leccionacao}/plano', [AvaliacaoController::class, 'plano'])->name('avaliacao.plano');
+        Route::put('disciplina/{leccionacao}/notas', [AvaliacaoController::class, 'notas'])->name('avaliacao.notas');
+        Route::put('{pauta}/exame', [AvaliacaoController::class, 'exame'])->name('pautas.exame');
+        Route::post('{pauta}/submeter', [AvaliacaoController::class, 'submeter'])->name('pautas.submeter');
+        Route::get('{pauta}/imprimir', [PautaController::class, 'imprimir'])->name('pautas.imprimir');
+        Route::middleware('can:pautas.validar')->controller(AvaliacaoController::class)->group(function () {
+            Route::post('{pauta}/validar', 'validar')->name('pautas.validar');
+            Route::post('{pauta}/devolver', 'devolver')->name('pautas.devolver');
+            Route::post('{pauta}/publicar', 'publicar')->name('pautas.publicar');
+        });
+    });
+
+    // Finanças do estudante: cobranças, tabela de preços e geração das cobranças do ano
+    Route::middleware('can:financas.ver')->prefix('financas')->controller(FinancasController::class)->group(function () {
+        Route::get('/', 'index')->name('financas.index');
+        Route::get('precos', 'precos')->name('financas.precos');
+        Route::post('precos', 'guardarPreco')->middleware('can:financas.configurar')->name('financas.precos.guardar');
+        Route::delete('precos/{preco}', 'apagarPreco')->middleware('can:financas.configurar')->name('financas.precos.apagar');
+        Route::post('gerar', 'gerar')->middleware('can:cobrancas.gerar')->name('financas.gerar');
+    });
+    Route::middleware('can:financas.ver')->group(function () {
+        Route::get('financas/recibos/{pagamento}', [PagamentoController::class, 'recibo'])->name('pagamentos.recibo');
+        Route::post('estudantes/{estudante}/pagamentos', [PagamentoController::class, 'store'])->middleware('can:pagamentos.registar')->name('pagamentos.store');
+        Route::post('financas/recibos/{pagamento}/anular', [PagamentoController::class, 'anular'])->middleware('can:pagamentos.anular')->name('pagamentos.anular');
+    });
+
+    // Documentos académicos: emitidos a partir da ficha do estudante, com número e código de verificação
+    Route::middleware('can:documentos.ver')->group(function () {
+        Route::get('documentos', [DocumentoController::class, 'index'])->name('documentos.index');
+        Route::get('documentos/pedidos', [PedidoController::class, 'index'])->name('pedidos.index');
+        Route::get('documentos/{documento}', [DocumentoController::class, 'show'])->whereNumber('documento')->name('documentos.show');
+        Route::middleware('can:documentos.emitir')->group(function () {
+            Route::post('estudantes/{estudante}/documentos', [DocumentoController::class, 'store'])->name('documentos.store');
+            Route::post('documentos/{documento}/anular', [DocumentoController::class, 'anular'])->name('documentos.anular');
+            Route::post('documentos/pedidos/{pedido}/emitir', [PedidoController::class, 'emitir'])->name('pedidos.emitir');
+            Route::post('documentos/pedidos/{pedido}/recusar', [PedidoController::class, 'recusar'])->name('pedidos.recusar');
+            Route::post('documentos/pedidos/{pedido}/entregar', [PedidoController::class, 'entregar'])->name('pedidos.entregar');
+        });
     });
 
     // Administração: contas da equipa, perfis e permissões, auditoria (do nsERP)
@@ -124,6 +223,25 @@ Route::middleware(['auth:web'])->group(function () {
             ->defaults('slug', $slug)
             ->name('modulos.'.$slug);
     }
+});
+
+// Portal do estudante: entrada própria (número de estudante e senha) e guarda própria; nunca abre o sistema interno
+Route::prefix('portal')->name('portal.')->group(function () {
+    Route::middleware('guest:estudante')->group(function () {
+        Route::get('entrar', [EntradaController::class, 'create'])->name('entrar');
+        Route::post('entrar', [EntradaController::class, 'store'])->middleware('throttle:20,1')->name('entrar.store');
+    });
+    Route::middleware('auth:estudante')->group(function () {
+        Route::get('/', PainelController::class)->name('painel');
+        Route::post('pedidos', [PedidoDocumentoController::class, 'store'])->middleware('throttle:10,1')->name('pedidos.store');
+        Route::post('sair', [EntradaController::class, 'destroy'])->name('sair');
+    });
+});
+
+// Verificação pública dos documentos emitidos (o QR do documento abre esta página); sem entrar, com limite de pedidos
+Route::middleware('throttle:30,1')->group(function () {
+    Route::get('verificar', [VerificacaoController::class, 'formulario'])->name('verificar.formulario');
+    Route::get('verificar/{codigo}', [VerificacaoController::class, 'mostrar'])->where('codigo', '[A-Za-z0-9-]{1,20}')->name('verificar');
 });
 
 // Logótipo da instituição: público, porque vai nos documentos e na página de entrada.

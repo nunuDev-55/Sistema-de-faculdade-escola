@@ -32,32 +32,32 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 | 2.1 | Unidades orgânicas e cursos / classes | **Feito**: unidades orgânicas e cursos com grau e duração |
 | 2.2 | Disciplinas e planos curriculares | **Feito**: versões (rascunho → em vigor → substituído), precedências por plano, créditos, método de avaliação por plano (OpenEduCat) |
 | 2.3 | Anos e períodos lectivos | **Feito**: calendário, prazos de inscrição e exames; geração dos períodos a partir do ano (2 semestres / 3 trimestres, OpenEduCat) |
-| 2.4 | Salas e docentes | Ficha do docente ligada ao utilizador |
+| 2.4 | Salas e docentes | **Feito**: salas com tipo e lotação; ficha do docente (grau, categoria, regime, unidade) ligada à conta com que entra |
 
 ## Fase 3 — Percurso do estudante
 
 | # | Módulo | O que inclui |
 |---|---|---|
 | 3.1 | Estudantes e encarregados | **Feito**: número único por ano de entrada, ficha com separadores, encarregados (um para vários irmãos, pelo telemóvel), pesquisa e filtros. Falta a importação do Excel e a fotografia |
-| 3.2 | Matrícula e inscrição | **Feito**: matrícula no plano em vigor (a renovação mantém o plano em que entrou), suspender / reactivar / anular, inscrição semestral com precedências, disciplinas em atraso e limite de créditos, comprovativo para imprimir; no ensino geral, inscrição anual em todas as disciplinas da classe. Falta a distribuição por turmas (com a oferta lectiva) e o pedido de inscrição no portal |
-| 3.3 | Distribuição de serviço e horários | Sem sobreposições |
+| 3.2 | Matrícula e inscrição | **Feito**: matrícula no plano em vigor (a renovação mantém o plano em que entrou), suspender / reactivar / anular, inscrição semestral com precedências, disciplinas em atraso e limite de créditos, comprovativo para imprimir; no ensino geral, inscrição anual em todas as disciplinas da classe. Falta o pedido de inscrição no portal |
+| 3.3 | Turmas, distribuição de serviço e horários | **Feito em parte**: turmas por curso, ano e semestre (do ano todo no ensino geral) com as disciplinas do plano; docente de cada disciplina em cada turma; estudantes distribuídos por ordem alfabética e lotação, disciplinas em atraso na turma onde são dadas; o docente vê as suas turmas. Falta o horário sem sobreposições |
 | 3.4 | Sumários e presenças | Folha de presenças, justificações, assiduidade |
 
 ## Fase 4 — Avaliação
 
 | # | Módulo | O que inclui |
 |---|---|---|
-| 4.1 | Plano de avaliação e lançamento de notas | Escala de classificação por intervalos (Frappe); folha de notas tipo Excel |
-| 4.2 | Pautas | Rascunho → submetida → validada → publicada → fechada; impressão |
-| 4.3 | Exame e recorrência / trimestres e conselho de notas | Os dois tipos de instituição |
+| 4.1 | Plano de avaliação e lançamento de notas | **Feito**: plano de avaliação por disciplina e turma (pesos somam 100 %, modelo 2 testes + 2 trabalhos); folha de notas com a média e a situação ao vivo; F para quem faltou; só o docente da disciplina lança (RN-10) |
+| 4.2 | Pautas | **Feito em parte**: rascunho → submetida → validada → publicada, devolver ao docente com o motivo, número ao publicar, pauta para imprimir; ao publicar, os resultados passam para as inscrições e abrem as precedências. Falta fechar a época |
+| 4.3 | Exame e recorrência / trimestres e conselho de notas | **Feito em parte**: ensino superior com frequência (excluído, admitido, dispensado), exame normal e recorrência, nota final com o peso do exame da Configuração. Falta a época especial e o ensino geral (trimestres e passagem de classe) |
 | 4.4 | Revisões de nota | Sem apagar a anterior |
 
 ## Fase 5 — Finanças
 
 | # | Módulo | O que inclui |
 |---|---|---|
-| 5.1 | Tabela de preços e geração de cobranças | Por ano lectivo e curso |
-| 5.2 | Pagamentos, recibos e referências bancárias | Parciais, adiantamentos, alocação, recibo assinado (da facturação do nsERP); uma referência por cobrança e baixa pelo ficheiro do banco |
+| 5.1 | Tabela de preços e geração de cobranças | **Feito**: tabela de preços por ano lectivo (geral ou por curso): taxa de inscrição por período e propina mensal; cobranças geradas uma vez por inscrição, com vencimento no dia de pagamento; totais cobrado, pago e vencido |
+| 5.2 | Pagamentos, recibos e referências bancárias | **Feito em parte**: pagamento com recibo numerado (numerário, banco, M-Pesa, e-Mola, POS); abate as cobranças mais antigas, o que sobra é adiantamento e abate as seguintes; anular recibo com motivo; conta corrente na ficha do estudante. Falta a referência bancária por cobrança e a baixa pelo ficheiro do banco |
 | 5.3 | Multas, bolsas e descontos, bloqueios por dívida | |
 | 5.4 | Devedores e lembretes | E-mail, depois SMS / WhatsApp |
 
@@ -65,8 +65,8 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 
 | # | Módulo | O que inclui |
 |---|---|---|
-| 6.1 | Portal do estudante e do encarregado | Horário, notas, presenças, finanças |
-| 6.2 | Pedidos e emissão de documentos | Declarações, certificados, histórico, QR de verificação |
+| 6.1 | Portal do estudante e do encarregado | **Feito em parte**: portal do estudante com entrada própria (número de estudante e senha entregue pela secretaria, guarda separada da equipa): matrículas, disciplinas e notas só de pautas publicadas ("Por lançar" antes, RN-16), propinas por pagar e pagamentos. Falta o encarregado, o horário, as presenças e a inscrição online |
+| 6.2 | Pedidos e emissão de documentos | **Feito em parte**: declaração de matrícula e de frequência, histórico escolar (só notas de pautas publicadas, média ponderada pelos créditos) e certificado de habilitações (só com todas as disciplinas obrigatórias do plano aprovadas, média final por extenso e menção), emitidos na ficha do estudante; número DC, conteúdo congelado e assinado (HMAC), código e QR de verificação; página pública `/verificar` (válido, anulado, não confere, inexistente); anular com motivo. **Pedidos**: o estudante pede no portal, o pedido gera o emolumento da tabela de preços (o adiantamento paga-o logo), a secretaria emite só com o emolumento pago, marca a entrega ou recusa com o motivo, que o estudante vê no portal. Falta o modelo de documento editável pela instituição |
 | 6.3 | Candidaturas online | Fases, vagas, resultados, admissão |
 | 6.4 | Avisos e SMS | Por curso, turma, perfil, candidatos admitidos |
 | 6.5 | Inscrição na graduação | Finalistas, lista e reimpressão |

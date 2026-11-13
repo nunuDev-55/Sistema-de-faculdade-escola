@@ -24,6 +24,7 @@ interface Props {
         minimo_dispensa_exame: number;
         assiduidade_minima: number;
         limite_creditos: number;
+        peso_exame: number;
         intervalos: Intervalo[];
     };
 }
@@ -36,6 +37,7 @@ interface Formulario {
     minimo_dispensa_exame: string;
     assiduidade_minima: string;
     limite_creditos: string;
+    peso_exame: string;
     intervalos: { min: string; max: string; grau: string }[];
 }
 
@@ -48,6 +50,7 @@ export default function Avaliacao({ dados }: Props) {
         minimo_dispensa_exame: numeroCampo(dados.minimo_dispensa_exame),
         assiduidade_minima: String(dados.assiduidade_minima),
         limite_creditos: numeroCampo(dados.limite_creditos),
+        peso_exame: String(dados.peso_exame),
         intervalos: dados.intervalos.map((i) => ({ min: numeroCampo(i.min), max: numeroCampo(i.max), grau: i.grau })),
     });
     const erros = errors as Record<string, string | undefined>;
@@ -106,6 +109,12 @@ export default function Avaliacao({ dados }: Props) {
                     {numero('minimo_admissao_exame', 'Mínimo para ir a exame', 'Abaixo disto, a média de frequência exclui o estudante.')}
                     {numero('minimo_dispensa_exame', 'Mínimo para dispensar o exame', 'A partir disto, o estudante fica dispensado.')}
                     {numero('assiduidade_minima', 'Assiduidade mínima', 'Abaixo disto, o estudante fica excluído por faltas.', '%')}
+                    {numero(
+                        'peso_exame',
+                        'Peso do exame na nota final',
+                        'O resto é a média de frequência. 50 % = metade de cada; 100 % = só o exame.',
+                        '%',
+                    )}
                 </Bloco>
 
                 <Bloco titulo="Inscrição semestral">
