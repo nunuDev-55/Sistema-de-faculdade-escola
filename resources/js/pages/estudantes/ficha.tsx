@@ -89,9 +89,194 @@ interface Props {
     opcoesMatricula: OpcoesMatricula;
     parentescos: Opcao[];
     superior: boolean;
+    financas: ContaCorrente | null;
+    metodos: Opcao[];
 }
 
-type Separador = 'percurso' | 'dados' | 'encarregados';
+type Separador = 'percurso' | 'dados' | 'encarregados' | 'financas';
+
+interface ContaCorrente {
+    cobrancas: {
+        id: number;
+        numero: string;
+        descricao: string;
+        valor: string;
+        pago: string;
+        vencimento: string;
+        estado: string;
+        estado_rotulo: string;
+        vencida: boolean;
+    }[];
+    pagamentos: { id: number; numero: string; data: string; valor: string; metodo: string; estado: string }[];
+    divida: string;
+    vencido: string;
+    credito: string;
+}
+
+/* ---------------------------------------------------------------- Finanças */
+
+function NovoPagamento({ estudanteId, metodos, fechar }: { estudanteId: number; metodos: Opcao[]; fechar: () => void }) {
+    const { data, setData, post, processing, errors } = useForm({
+        valor: '',
+        data: new Date().toISOString().slice(0, 10),
+        metodo: 'numerario',
+        referencia: '',
+    });
+    const guardar = (e: FormEvent) => {
+        e.preventDefault();
+        post(route('pagamentos.store', estudanteId), { onSuccess: fechar });
+    };
+    return (
+        <form onSubmit={guardar} className="border-b">
+            <LinhaForm
+                rotulo="Valor (MT)"
+                htmlFor="pg_valor"
+                obrigatorio
+                ajuda="Abate as cobranças que vencem primeiro; o que sobrar fica como adiantamento."
+            >
+                <Input
+                    id="pg_valor"
+                    inputMode="decimal"
+                    value={data.valor}
+                    onChange={(e) => setData('valor', e.target.value)}
+                    className="max-w-40 tabular-nums"
+                />
+                <InputError message={errors.valor} className="mt-1" />
+            </LinhaForm>
+            <LinhaForm rotulo="Data" htmlFor="pg_data" obrigatorio>
+                <Input id="pg_data" type="date" value={data.data} onChange={(e) => setData('data', e.target.value)} className="max-w-48" />
+                <InputError message={errors.data} className="mt-1" />
+            </LinhaForm>
+            <LinhaForm rotulo="Forma de pagamento" htmlFor="pg_metodo" obrigatorio>
+                <CaixaEscolha id="pg_metodo" value={data.metodo} onChange={(e) => setData('metodo', e.target.value)} className="max-w-60">
+                    {metodos.map((m) => (
+                        <option key={m.valor} value={m.valor}>
+                            {m.rotulo}
+                        </option>
+                    ))}
+                </CaixaEscolha>
+            </LinhaForm>
+            <LinhaForm rotulo="Referência" htmlFor="pg_referencia" ajuda="Número do talão do banco ou da transacção M-Pesa / e-Mola.">
+                <Input id="pg_referencia" value={data.referencia} onChange={(e) => setData('referencia', e.target.value)} className="max-w-64" />
+            </LinhaForm>
+            <div className="flex justify-end gap-2 px-5 py-3">
+                <Button type="button" variant="outline" onClick={fechar}>
+                    Cancelar
+                </Button>
+                <Button type="submit" disabled={processing}>
+                    Registar e emitir recibo
+                </Button>
+            </div>
+        </form>
+    );
+}
+
+function Financas({ estudanteId, conta, metodos }: { estudanteId: number; conta: ContaCorrente; metodos: Opcao[] }) {
+    const pode = usePode();
+    const [novo, setNovo] = useState(false);
+    const mt = (v: string) => `${Number(v).toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MT`;
+    return (
+        <div className="flex flex-col gap-5">
+            <div className="grid gap-3 sm:grid-cols-3">
+                {[
+                    ['Em dívida', conta.divida, ''],
+                    ['Vencido', conta.vencido, 'text-red-700 dark:text-red-400'],
+                    ['Adiantamento', conta.credito, 'text-green-700 dark:text-green-400'],
+                ].map(([rotulo, valor, cor]) => (
+                    <div key={rotulo} className="painel px-4 py-3">
+                        <div className="text-muted-foreground text-[12.5px]">{rotulo}</div>
+                        <div className={`text-[19px] font-semibold tabular-nums ${cor}`}>{mt(valor)}</div>
+                    </div>
+                ))}
+            </div>
+            <Bloco
+                titulo="Pagamentos"
+                accoes={
+                    pode('pagamentos.registar') &&
+                    !novo && (
+                        <Button size="sm" onClick={() => setNovo(true)}>
+                            <Plus /> Registar pagamento
+                        </Button>
+                    )
+                }
+            >
+                {novo && <NovoPagamento estudanteId={estudanteId} metodos={metodos} fechar={() => setNovo(false)} />}
+                <table className="tabela">
+                    <thead>
+                        <tr>
+                            <th>Recibo</th>
+                            <th>Data</th>
+                            <th>Forma</th>
+                            <th className="text-right">Valor</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {conta.pagamentos.length === 0 && <LinhaVazia colunas={5} texto="Ainda não há pagamentos." />}
+                        {conta.pagamentos.map((p) => (
+                            <tr key={p.id}>
+                                <td>
+                                    <Link href={route('pagamentos.recibo', p.id)} className="font-mono text-[12.5px] hover:underline">
+                                        {p.numero}
+                                    </Link>
+                                </td>
+                                <td className="tabular-nums">{formatData(p.data)}</td>
+                                <td>{p.metodo}</td>
+                                <td className="text-right tabular-nums">{mt(p.valor)}</td>
+                                <td>{p.estado === 'valido' ? <Estado cor="verde">Válido</Estado> : <Estado cor="cinza">Anulado</Estado>}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </Bloco>
+            <Bloco titulo="Cobranças">
+                <table className="tabela">
+                    <thead>
+                        <tr>
+                            <th>Cobrança</th>
+                            <th>Descrição</th>
+                            <th>Vencimento</th>
+                            <th className="text-right">Valor</th>
+                            <th className="text-right">Pago</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {conta.cobrancas.length === 0 && <LinhaVazia colunas={6} texto="Ainda não há cobranças." />}
+                        {conta.cobrancas.map((c) => (
+                            <tr key={c.id}>
+                                <td className="font-mono text-[12.5px]">{c.numero}</td>
+                                <td>{c.descricao}</td>
+                                <td className="tabular-nums">{formatData(c.vencimento)}</td>
+                                <td className="text-right tabular-nums">{mt(c.valor)}</td>
+                                <td className="text-right tabular-nums">{mt(c.pago)}</td>
+                                <td>
+                                    {c.vencida ? (
+                                        <Estado cor="vermelho">Vencida</Estado>
+                                    ) : (
+                                        <Estado
+                                            cor={
+                                                c.estado === 'paga'
+                                                    ? 'verde'
+                                                    : c.estado === 'parcial'
+                                                      ? 'azul'
+                                                      : c.estado === 'anulada'
+                                                        ? 'cinza'
+                                                        : 'laranja'
+                                            }
+                                        >
+                                            {c.estado_rotulo}
+                                        </Estado>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </Bloco>
+        </div>
+    );
+}
 
 /* ---------------------------------------------------------------- Nova matrícula */
 
@@ -434,7 +619,7 @@ function NovoEncarregado({ estudanteId, parentescos, fechar }: { estudanteId: nu
 
 /* ---------------------------------------------------------------- Ficha */
 
-export default function FichaEstudante({ estudante, encarregados, matriculas, opcoesMatricula, parentescos, superior }: Props) {
+export default function FichaEstudante({ estudante, encarregados, matriculas, opcoesMatricula, parentescos, superior, financas, metodos }: Props) {
     const pode = usePode();
     const [separador, setSeparador] = useState<Separador>('percurso');
     const [novaMatricula, setNovaMatricula] = useState(false);
@@ -481,6 +666,7 @@ export default function FichaEstudante({ estudante, encarregados, matriculas, op
                     { valor: 'percurso', label: 'Matrículas e inscrições' },
                     { valor: 'dados', label: 'Dados pessoais' },
                     { valor: 'encarregados', label: `Encarregados (${encarregados.length})` },
+                    ...(financas ? [{ valor: 'financas' as const, label: 'Finanças' }] : []),
                 ]}
                 activo={separador}
                 mudar={setSeparador}
@@ -576,6 +762,8 @@ export default function FichaEstudante({ estudante, encarregados, matriculas, op
                     </table>
                 </Bloco>
             )}
+
+            {separador === 'financas' && financas && <Financas estudanteId={estudante.id} conta={financas} metodos={metodos} />}
         </AppLayout>
     );
 }

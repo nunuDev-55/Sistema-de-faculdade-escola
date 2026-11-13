@@ -19,7 +19,7 @@ class CobrancaService
 {
     public const MESES = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-    public function __construct(private Numeracao $numeracao) {}
+    public function __construct(private Numeracao $numeracao, private PagamentoService $pagamentos) {}
 
     /** O preço que vale para o curso: o do próprio curso, se houver, senão o geral. */
     public function preco(int $anoLectivoId, int $cursoId, string $tipo): ?Preco
@@ -60,6 +60,8 @@ class CobrancaService
                 }
             }
             $inscricao->update(['estado_facturacao' => 'geradas']);
+            // Um adiantamento que o estudante já tenha abate logo as cobranças novas
+            $this->pagamentos->alocar($matricula->estudante);
             activity('financas')->performedOn($inscricao)->log("{$criadas} cobranças geradas para a inscrição {$inscricao->codigo}");
 
             return $criadas;

@@ -20,6 +20,7 @@ use App\Http\Controllers\Estudantes\EstudanteController;
 use App\Http\Controllers\Estudantes\InscricaoController;
 use App\Http\Controllers\Estudantes\MatriculaController;
 use App\Http\Controllers\Financas\FinancasController;
+use App\Http\Controllers\Financas\PagamentoController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\ModuloController;
 use App\Models\User;
@@ -154,6 +155,11 @@ Route::middleware(['auth:web'])->group(function () {
         Route::post('precos', 'guardarPreco')->middleware('can:financas.configurar')->name('financas.precos.guardar');
         Route::delete('precos/{preco}', 'apagarPreco')->middleware('can:financas.configurar')->name('financas.precos.apagar');
         Route::post('gerar', 'gerar')->middleware('can:cobrancas.gerar')->name('financas.gerar');
+    });
+    Route::middleware('can:financas.ver')->group(function () {
+        Route::get('financas/recibos/{pagamento}', [PagamentoController::class, 'recibo'])->name('pagamentos.recibo');
+        Route::post('estudantes/{estudante}/pagamentos', [PagamentoController::class, 'store'])->middleware('can:pagamentos.registar')->name('pagamentos.store');
+        Route::post('financas/recibos/{pagamento}/anular', [PagamentoController::class, 'anular'])->middleware('can:pagamentos.anular')->name('pagamentos.anular');
     });
 
     // Administração: contas da equipa, perfis e permissões, auditoria (do nsERP)
