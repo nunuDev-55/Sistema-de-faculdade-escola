@@ -153,7 +153,7 @@ final class Permissoes
             'estudantes.ver', 'matriculas.estado', 'turmas.ver', 'docentes.gerir',
             'pautas.ver', 'pautas.validar', 'pautas.rever',
             'financas.ver', 'financas.configurar', 'descontos.gerir', 'pagamentos.anular',
-            'avisos.enviar', 'sms.enviar', 'auditoria.ver',
+            'documentos.ver', 'avisos.enviar', 'sms.enviar', 'auditoria.ver',
         ],
         'Director de curso' => [
             'estrutura.ver', 'estrutura.gerir',

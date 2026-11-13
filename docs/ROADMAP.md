@@ -66,7 +66,7 @@ Regra de trabalho (a do nsERP): um módulo só fica "feito" quando tem ecrãs (t
 | # | Módulo | O que inclui |
 |---|---|---|
 | 6.1 | Portal do estudante e do encarregado | **Feito em parte**: portal do estudante com entrada própria (número de estudante e senha entregue pela secretaria, guarda separada da equipa): matrículas, disciplinas e notas só de pautas publicadas ("Por lançar" antes, RN-16), propinas por pagar e pagamentos. Falta o encarregado, o horário, as presenças e a inscrição online |
-| 6.2 | Pedidos e emissão de documentos | Declarações, certificados, histórico, QR de verificação |
+| 6.2 | Pedidos e emissão de documentos | **Feito em parte**: declaração de matrícula e de frequência, histórico escolar (só notas de pautas publicadas, média ponderada pelos créditos) e certificado de habilitações (só com todas as disciplinas obrigatórias do plano aprovadas, média final por extenso e menção), emitidos na ficha do estudante; número DC, conteúdo congelado e assinado (HMAC), código e QR de verificação; página pública `/verificar` (válido, anulado, não confere, inexistente); anular com motivo. Falta o pedido no portal, o emolumento e a fila da secretaria |
 | 6.3 | Candidaturas online | Fases, vagas, resultados, admissão |
 | 6.4 | Avisos e SMS | Por curso, turma, perfil, candidatos admitidos |
 | 6.5 | Inscrição na graduação | Finalistas, lista e reimpressão |

@@ -9,6 +9,8 @@ use App\Http\Controllers\Avaliacao\PautaController;
 use App\Http\Controllers\Docencia\DocenteController;
 use App\Http\Controllers\Docencia\MinhasTurmasController;
 use App\Http\Controllers\Docencia\TurmaController;
+use App\Http\Controllers\Documentos\DocumentoController;
+use App\Http\Controllers\Documentos\VerificacaoController;
 use App\Http\Controllers\Estrutura\CalendarioController;
 use App\Http\Controllers\Estrutura\CursoController;
 use App\Http\Controllers\Estrutura\DisciplinaController;
@@ -167,6 +169,16 @@ Route::middleware(['auth:web'])->group(function () {
         Route::post('financas/recibos/{pagamento}/anular', [PagamentoController::class, 'anular'])->middleware('can:pagamentos.anular')->name('pagamentos.anular');
     });
 
+    // Documentos académicos: emitidos a partir da ficha do estudante, com número e código de verificação
+    Route::middleware('can:documentos.ver')->group(function () {
+        Route::get('documentos', [DocumentoController::class, 'index'])->name('documentos.index');
+        Route::get('documentos/{documento}', [DocumentoController::class, 'show'])->name('documentos.show');
+        Route::middleware('can:documentos.emitir')->group(function () {
+            Route::post('estudantes/{estudante}/documentos', [DocumentoController::class, 'store'])->name('documentos.store');
+            Route::post('documentos/{documento}/anular', [DocumentoController::class, 'anular'])->name('documentos.anular');
+        });
+    });
+
     // Administração: contas da equipa, perfis e permissões, auditoria (do nsERP)
     Route::prefix('administracao')->group(function () {
         Route::get('utilizadores', [UtilizadorController::class, 'index'])->middleware('can:utilizadores.ver')->name('utilizadores.index');
@@ -217,6 +229,12 @@ Route::prefix('portal')->name('portal.')->group(function () {
         Route::get('/', PainelController::class)->name('painel');
         Route::post('sair', [EntradaController::class, 'destroy'])->name('sair');
     });
+});
+
+// Verificação pública dos documentos emitidos (o QR do documento abre esta página); sem entrar, com limite de pedidos
+Route::middleware('throttle:30,1')->group(function () {
+    Route::get('verificar', [VerificacaoController::class, 'formulario'])->name('verificar.formulario');
+    Route::get('verificar/{codigo}', [VerificacaoController::class, 'mostrar'])->where('codigo', '[A-Za-z0-9-]{1,20}')->name('verificar');
 });
 
 // Logótipo da instituição: público, porque vai nos documentos e na página de entrada.

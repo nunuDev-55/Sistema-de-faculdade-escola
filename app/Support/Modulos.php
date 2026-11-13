@@ -66,6 +66,7 @@ final class Modulos
             'href' => '/documentos',
             'titulo' => 'Documentos académicos',
             'permissao' => 'documentos.ver',
+            'feito' => true,
             'descricao' => 'Declarações, certificados e histórico escolar, com número e QR de verificação.',
             'planeado' => ['Pedido de documento no portal', 'Emolumento e fila da secretaria', 'Emissão com QR de verificação', 'Verificação pública em /verificar/{codigo}'],
         ],

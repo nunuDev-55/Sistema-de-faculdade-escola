@@ -92,9 +92,21 @@ interface Props {
     financas: ContaCorrente | null;
     metodos: Opcao[];
     portal: { conta: { estado: string; ultimo_acesso: string | null } | null; senha: string | null };
+    documentos: DocumentoFicha[] | null;
+    tiposDocumento: Opcao[];
 }
 
-type Separador = 'percurso' | 'dados' | 'encarregados' | 'financas';
+interface DocumentoFicha {
+    id: number;
+    numero: string;
+    tipo: string;
+    finalidade: string | null;
+    emitido_em: string;
+    emitido_por: string | null;
+    estado: string;
+}
+
+type Separador = 'percurso' | 'dados' | 'encarregados' | 'financas' | 'documentos';
 
 interface ContaCorrente {
     cobrancas: {
@@ -330,6 +342,160 @@ function Financas({ estudanteId, conta, metodos }: { estudanteId: number; conta:
                 </table>
             </Bloco>
         </div>
+    );
+}
+
+/* ---------------------------------------------------------------- Documentos */
+
+const DE_MATRICULA = ['declaracao_matricula', 'declaracao_frequencia'];
+
+function EmitirDocumento({
+    estudanteId,
+    tipos,
+    matriculas,
+    fechar,
+}: {
+    estudanteId: number;
+    tipos: Opcao[];
+    matriculas: Matricula[];
+    fechar: () => void;
+}) {
+    const activas = matriculas.filter((m) => m.estado === 'activa');
+    const { data, setData, post, processing, errors } = useForm({
+        tipo: 'declaracao_matricula',
+        matricula_id: String(activas[0]?.id ?? matriculas[0]?.id ?? ''),
+        finalidade: '',
+    });
+    const emitir = (e: FormEvent) => {
+        e.preventDefault();
+        post(route('documentos.store', estudanteId));
+    };
+    return (
+        <form onSubmit={emitir} className="border-b">
+            <LinhaForm rotulo="Documento" htmlFor="dc_tipo" obrigatorio>
+                <CaixaEscolha id="dc_tipo" value={data.tipo} onChange={(e) => setData('tipo', e.target.value)} className="max-w-72">
+                    {tipos.map((t) => (
+                        <option key={t.valor} value={t.valor}>
+                            {t.rotulo}
+                        </option>
+                    ))}
+                </CaixaEscolha>
+                <InputError message={errors.tipo} className="mt-1" />
+            </LinhaForm>
+            {DE_MATRICULA.includes(data.tipo) ? (
+                <LinhaForm rotulo="Matrícula" htmlFor="dc_matricula" obrigatorio ajuda="A declaração diz respeito a este ano lectivo.">
+                    <CaixaEscolha
+                        id="dc_matricula"
+                        value={data.matricula_id}
+                        onChange={(e) => setData('matricula_id', e.target.value)}
+                        className="max-w-96"
+                    >
+                        {matriculas.map((m) => (
+                            <option key={m.id} value={m.id}>
+                                {m.ano_lectivo} · {m.curso} · {m.estado_rotulo}
+                            </option>
+                        ))}
+                    </CaixaEscolha>
+                    <InputError message={errors.matricula_id} className="mt-1" />
+                </LinhaForm>
+            ) : (
+                <LinhaForm rotulo="Curso" htmlFor="dc_matricula" ajuda="Só entram as notas de pautas publicadas.">
+                    <CaixaEscolha
+                        id="dc_matricula"
+                        value={data.matricula_id}
+                        onChange={(e) => setData('matricula_id', e.target.value)}
+                        className="max-w-96"
+                    >
+                        {matriculas
+                            .filter((m, i) => matriculas.findIndex((o) => o.curso_id === m.curso_id) === i)
+                            .map((m) => (
+                                <option key={m.id} value={m.id}>
+                                    {m.curso}
+                                </option>
+                            ))}
+                    </CaixaEscolha>
+                    <InputError message={errors.matricula_id} className="mt-1" />
+                </LinhaForm>
+            )}
+            <LinhaForm
+                rotulo="Finalidade"
+                htmlFor="dc_finalidade"
+                ajuda="Opcional. Ex.: efeitos de bolsa de estudo; apresentação na entidade empregadora."
+            >
+                <Input id="dc_finalidade" value={data.finalidade} onChange={(e) => setData('finalidade', e.target.value)} className="max-w-96" />
+                <InputError message={errors.finalidade} className="mt-1" />
+            </LinhaForm>
+            <div className="flex justify-end gap-2 px-5 py-3">
+                <Button type="button" variant="outline" onClick={fechar}>
+                    Cancelar
+                </Button>
+                <Button type="submit" disabled={processing || data.matricula_id === ''}>
+                    Emitir
+                </Button>
+            </div>
+        </form>
+    );
+}
+
+function Documentos({
+    estudanteId,
+    documentos,
+    tipos,
+    matriculas,
+}: {
+    estudanteId: number;
+    documentos: DocumentoFicha[];
+    tipos: Opcao[];
+    matriculas: Matricula[];
+}) {
+    const pode = usePode();
+    const [novo, setNovo] = useState(false);
+    return (
+        <Bloco
+            titulo="Documentos emitidos"
+            accoes={
+                pode('documentos.emitir') &&
+                !novo &&
+                matriculas.length > 0 && (
+                    <Button size="sm" onClick={() => setNovo(true)}>
+                        <Plus /> Emitir documento
+                    </Button>
+                )
+            }
+        >
+            {novo && <EmitirDocumento estudanteId={estudanteId} tipos={tipos} matriculas={matriculas} fechar={() => setNovo(false)} />}
+            <table className="tabela">
+                <thead>
+                    <tr>
+                        <th>Documento</th>
+                        <th>Tipo</th>
+                        <th>Emitido</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {documentos.length === 0 && <LinhaVazia colunas={4} texto="Ainda não foram emitidos documentos." />}
+                    {documentos.map((d) => (
+                        <tr key={d.id}>
+                            <td>
+                                <Link href={route('documentos.show', d.id)} className="font-mono text-[12.5px] hover:underline">
+                                    {d.numero}
+                                </Link>
+                            </td>
+                            <td>
+                                {d.tipo}
+                                {d.finalidade && <div className="text-muted-foreground text-[12px]">{d.finalidade}</div>}
+                            </td>
+                            <td className="tabular-nums">
+                                {formatData(d.emitido_em)}
+                                {d.emitido_por && <span className="text-muted-foreground"> · {d.emitido_por}</span>}
+                            </td>
+                            <td>{d.estado === 'valido' ? <Estado cor="verde">Válido</Estado> : <Estado cor="cinza">Anulado</Estado>}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </Bloco>
     );
 }
 
@@ -684,6 +850,8 @@ export default function FichaEstudante({
     financas,
     metodos,
     portal,
+    documentos,
+    tiposDocumento,
 }: Props) {
     const pode = usePode();
     const [separador, setSeparador] = useState<Separador>(portal.senha ? 'dados' : 'percurso');
@@ -732,6 +900,7 @@ export default function FichaEstudante({
                     { valor: 'dados', label: 'Dados pessoais' },
                     { valor: 'encarregados', label: `Encarregados (${encarregados.length})` },
                     ...(financas ? [{ valor: 'financas' as const, label: 'Finanças' }] : []),
+                    ...(documentos ? [{ valor: 'documentos' as const, label: `Documentos (${documentos.length})` }] : []),
                 ]}
                 activo={separador}
                 mudar={setSeparador}
@@ -830,6 +999,14 @@ export default function FichaEstudante({
             )}
 
             {separador === 'financas' && financas && <Financas estudanteId={estudante.id} conta={financas} metodos={metodos} />}
+            {separador === 'documentos' && documentos && (
+                <Documentos
+                    estudanteId={estudante.id}
+                    documentos={documentos}
+                    tipos={tiposDocumento}
+                    matriculas={matriculas.filter((m) => m.estado !== 'anulada')}
+                />
+            )}
         </AppLayout>
     );
 }

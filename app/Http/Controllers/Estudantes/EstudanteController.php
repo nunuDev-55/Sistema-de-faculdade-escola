@@ -8,6 +8,7 @@ use App\Models\AnoLectivo;
 use App\Models\Cobranca;
 use App\Models\ContaPortal;
 use App\Models\Curso;
+use App\Models\DocumentoEmitido;
 use App\Models\Encarregado;
 use App\Models\Estudante;
 use App\Models\Inscricao;
@@ -123,6 +124,17 @@ class EstudanteController extends Controller
             'superior' => TipoInstituicao::eSuperior(),
             'financas' => $user->can('financas.ver') ? $this->contaCorrente($estudante, $pagamentos) : null,
             'metodos' => Opcoes::de(Pagamento::METODOS),
+            'documentos' => $user->can('documentos.ver') ? DocumentoEmitido::with('emitidoPor')->where('estudante_id', $estudante->id)
+                ->orderByDesc('emitido_em')->orderByDesc('id')->get()->map(fn (DocumentoEmitido $d) => [
+                    'id' => $d->id,
+                    'numero' => $d->numero,
+                    'tipo' => $d->nomeTipo(),
+                    'finalidade' => $d->finalidade,
+                    'emitido_em' => $d->emitido_em->toIso8601String(),
+                    'emitido_por' => $d->emitidoPor?->name,
+                    'estado' => $d->estado,
+                ])->values() : null,
+            'tiposDocumento' => Opcoes::de(DocumentoEmitido::TIPOS),
             'portal' => [
                 'conta' => ($conta = ContaPortal::where('estudante_id', $estudante->id)->first()) === null ? null : [
                     'estado' => $conta->estado,

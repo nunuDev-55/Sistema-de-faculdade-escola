@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AnoLectivo;
 use App\Models\Curso;
+use App\Models\DocumentoEmitido;
 use App\Models\Estudante;
 use App\Models\Matricula;
 use App\Models\PeriodoLectivo;
@@ -88,6 +89,10 @@ class InicioController extends Controller
                 'numero' => Curso::where('activo', true)->count(),
                 'legenda' => TipoInstituicao::eSuperior() ? 'cursos activos' : 'classes e ciclos activos',
                 'alerta' => $this->planosPorAprovar(),
+            ],
+            'documentos' => [
+                'numero' => DocumentoEmitido::where('estado', 'valido')->whereYear('emitido_em', now()->year)->count(),
+                'legenda' => 'documentos emitidos em '.now()->year,
             ],
             default => [],
         };

@@ -42,6 +42,7 @@ class AuditoriaController extends Controller
         'docencia' => 'Docentes e turmas',
         'pautas' => 'Notas e pautas',
         'financas' => 'Finanças',
+        'documentos' => 'Documentos académicos',
         'utilizadores' => 'Utilizadores',
         'perfis' => 'Perfis e permissões',
     ];
